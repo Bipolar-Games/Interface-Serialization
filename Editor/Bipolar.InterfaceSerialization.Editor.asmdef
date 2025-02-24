@@ -1,7 +1,9 @@
 {
     "name": "Bipolar.InterfaceSerialization.Editor",
     "rootNamespace": "Bipolar.Editor",
-    "references": [],
+    "references": [
+        "GUID:f15f1bd6373976940afc9cb47227de81"
+    ],
     "includePlatforms": [
         "Editor"
     ],
