@@ -16,7 +16,7 @@ namespace Bipolar
         private TObject serializedObject;
 
         private TInterface _value;
-        public TInterface Value
+        public virtual TInterface Value
         {
             get
             {
