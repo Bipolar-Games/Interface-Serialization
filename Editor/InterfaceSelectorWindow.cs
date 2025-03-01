@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Bipolar.Editor
 {
@@ -96,8 +97,21 @@ namespace Bipolar.Editor
 
         private static Component[] GetComponentsOfInterface(System.Type interfaceType)
         {
+            GameObject[] allGameObjects;
+            var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+            if (prefabStage)
+            {
+                var prefabRoot = prefabStage.prefabContentsRoot;
+                allGameObjects = prefabRoot.GetComponentsInChildren<Transform>()
+                    .Select(tf => tf.gameObject)
+                    .ToArray();
+            }
+            else
+            {
+                allGameObjects = FindObjectsOfType<GameObject>(true);
+            }
+
             var componentsOfInterface = new List<Component>();
-            var allGameObjects = FindObjectsOfType<GameObject>(true);
 
             var tempComponents = new List<Component>();
             foreach (var gameObject in allGameObjects)
@@ -174,8 +188,6 @@ namespace Bipolar.Editor
             var pressedObject = selectedObject;
 			//var listOfItems = new List<(GUIContent label, Object @object)>();
 			//listOfItems.Add((new GUIContent(noneObjectName, null, null), null));
-
-
 
             if (DrawSceneObjectListItem(null))
                 pressedObject = null;
