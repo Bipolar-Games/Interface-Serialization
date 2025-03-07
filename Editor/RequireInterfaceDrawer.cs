@@ -12,17 +12,11 @@ namespace Bipolar.Editor
         {
             if (property.propertyType == SerializedPropertyType.ObjectReference)
             {
-                var objectFieldRect = new Rect(position.x, position.y, position.width - InterfaceSelectorButton.Width, position.height);
-                var interfaceButtonRect = new Rect(position.x + objectFieldRect.width, position.y, InterfaceSelectorButton.Width, position.height);
+                EditorGUI.BeginProperty(position, label, property);
                 
                 var requiredAttribute = attribute as RequireInterfaceAttribute;
-                EditorGUI.BeginProperty(position, label, property);
                 var requiredType = requiredAttribute.RequiredType;
-                property.objectReferenceValue = EditorGUI.ObjectField(objectFieldRect, label, property.objectReferenceValue, requiredType, true);
-                if (GUI.Button(interfaceButtonRect, "I"))
-                {
-                    InterfaceSelectorWindow.Show(requiredType, property.objectReferenceValue, (obj) => AssignValue(property, obj));
-                }
+				InterfaceEditorGUI.InterfaceField(position, label, property, requiredType, true);
 
                 EditorGUI.EndProperty();
             }
@@ -33,12 +27,6 @@ namespace Bipolar.Editor
                 EditorGUI.LabelField(position, label, new GUIContent(errorMessage));
                 GUI.color = previousColor;
             }
-        }
-
-        private static void AssignValue (SerializedProperty interfaceProperty, Object @object)
-        {
-            interfaceProperty.objectReferenceValue = @object;
-            interfaceProperty.serializedObject.ApplyModifiedProperties();
         }
     }
 }
