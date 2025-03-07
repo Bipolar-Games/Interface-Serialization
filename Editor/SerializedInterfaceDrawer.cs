@@ -16,34 +16,12 @@ namespace Bipolar.Editor
 		{
 			EditorGUI.BeginProperty(position, label, property);
 
-			var objectFieldRect = new Rect(position.x, position.y, position.width - InterfaceSelectorButton.Width, position.height);
-			var interfaceButtonRect = new Rect(position.x + objectFieldRect.width, position.y, InterfaceSelectorButton.Width, position.height);
-
 			var serializedObjectProperty = property.FindPropertyRelative(serializedObjectPropertyName);
-
 			var requiredType = GetRequiredType();
-			if (requiredType != default)
-			{
-				serializedObjectProperty.objectReferenceValue = EditorGUI.ObjectField(objectFieldRect, label, serializedObjectProperty.objectReferenceValue, requiredType, true);
-				if (GUI.Button(interfaceButtonRect, "I"))
-				{
-					Object objectReferenceValue = serializedObjectProperty.objectReferenceValue;
-					InterfaceSelectorWindow.Show(requiredType, objectReferenceValue, (obj) => AssignValue(serializedObjectProperty, obj));
-				}
-			}
-			else
-			{
 
-			}
-
+			InterfaceEditorGUI.InterfaceField(position, label, serializedObjectProperty, requiredType, true);
 
 			EditorGUI.EndProperty();
-		}
-
-		private static void AssignValue(SerializedProperty property, Object @object)
-		{
-			property.objectReferenceValue = @object;
-			property.serializedObject.ApplyModifiedProperties();
 		}
 
 		private System.Type GetRequiredType()
