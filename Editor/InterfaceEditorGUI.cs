@@ -19,16 +19,20 @@ namespace Bipolar.Editor
 		private static Object DoInterfaceField(Rect position, GUIContent label, SerializedProperty serializedObjectProperty, Object @object, System.Type interfaceType, bool allowSceneObjects)
 		{
 			if (interfaceType == default)
-				return default;
+				throw new System.ArgumentNullException("Missing type of interface");
 
 			if (serializedObjectProperty == default && @object == default)
-				return default;
+				throw new System.ArgumentNullException("Missing serialized object");
+
+			int controlID = GUIUtility.GetControlID(hint: objectFieldHash, FocusType.Keyboard, position);
+
+
+			position = EditorGUI.PrefixLabel(position, controlID, label);
 
 			using var scope = new IconSizeScope(12, 12);
 
 			var currentEvent = Event.current;
 			var eventType = currentEvent.type;
-			int id = GUIUtility.GetControlID(hint: objectFieldHash, FocusType.Keyboard, position);
 
 			if (serializedObjectProperty != null)
 				@object = serializedObjectProperty.objectReferenceValue;
@@ -36,17 +40,17 @@ namespace Bipolar.Editor
 			switch (eventType)
 			{
 				case EventType.MouseDown:
-					HandleMouseDown();
+					HandleMousePress();
 					break;
 
 				case EventType.Repaint:
 					var tempContent = EditorGUIUtility.ObjectContent(serializedObjectProperty.objectReferenceValue, interfaceType);
 					var mousePosition = currentEvent.mousePosition;
-					Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, 1, DragAndDrop.activeControlID == id, position.Contains(mousePosition));
+					Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, 1, DragAndDrop.activeControlID == controlID, position.Contains(mousePosition));
 
 					var buttonStyle = Styles.ObjectSelectorButton;
 					var selectorButtonRect = buttonStyle.margin.Remove(GetButtonRect(position));
-					buttonStyle.Draw(selectorButtonRect, GUIContent.none, id, DragAndDrop.activeControlID == id, selectorButtonRect.Contains(mousePosition));
+					buttonStyle.Draw(selectorButtonRect, GUIContent.none, controlID, DragAndDrop.activeControlID == controlID, selectorButtonRect.Contains(mousePosition));
 					break;
 
 				case EventType.DragExited:
@@ -69,7 +73,7 @@ namespace Bipolar.Editor
 				property.serializedObject.ApplyModifiedProperties();
 			}
 
-			void HandleMouseDown()
+			void HandleMousePress()
 			{
 				var mousePosition = currentEvent.mousePosition;
 				if (currentEvent.button == 0 && position.Contains(mousePosition))
