@@ -60,16 +60,12 @@ namespace Bipolar.Editor
 					break;
 			}
 
-
-
-
-
-			AssignValue(@object);
+			//AssignValue(@object);
 			return @object;
 
-			void AssignValue(Object @object)
+			void AssignValue(Object assignedObject)
 			{
-				serializedObjectProperty.objectReferenceValue = @object;
+				serializedObjectProperty.objectReferenceValue = assignedObject;
 				serializedObjectProperty.serializedObject.ApplyModifiedProperties();
 			}
 
@@ -83,14 +79,46 @@ namespace Bipolar.Editor
 				EditorGUIUtility.editingTextField = false;
 				if (selectorButtonRect.Contains(mousePosition))
 				{
-					if (GUI.enabled)
-					{
-						InterfaceSelectorWindow.Show(interfaceType, @object, AssignValue);
-					}
+					HandleSelectorButtonPress();
 				}
 				else
 				{
+					HandleObjectFieldPress();
+				}
 
+				void HandleSelectorButtonPress()
+				{
+					if (GUI.enabled)
+					{
+						GUIUtility.keyboardControl = controlID;
+						InterfaceSelectorWindow.Show(interfaceType, @object, AssignValue);
+					}
+				}
+
+				void HandleObjectFieldPress()
+				{
+					var clickedObject = @object;
+					if (clickedObject is Component component)
+						clickedObject = component.gameObject;
+					if (EditorGUI.showMixedValue)
+						return;
+
+					switch (currentEvent.clickCount)
+					{
+						case 1:
+							GUIUtility.keyboardControl = controlID;
+							EditorGUIUtility.PingObject(clickedObject);
+
+							break;
+
+						case 2:
+							if (clickedObject)
+							{
+
+							}
+
+							break;
+					}
 				}
 			}
 		}
