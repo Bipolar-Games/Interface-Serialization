@@ -12,6 +12,8 @@ namespace Bipolar.Editor
 
 		private static readonly int objectFieldHash = "s_ObjectFieldHash".GetHashCode();
 
+
+
 		public static Object InterfaceField(Rect position, GUIContent label, Object @object, System.Type interfaceType, bool allowSceneObjects = true) => DoInterfaceField(position, label, null, @object, interfaceType, allowSceneObjects);
 
 		public static void InterfaceField(Rect position, GUIContent label, SerializedProperty serializedObjectProperty, System.Type interfaceType, bool allowSceneObjects = true) => DoInterfaceField(position, label, serializedObjectProperty, null, interfaceType, allowSceneObjects);
@@ -39,42 +41,54 @@ namespace Bipolar.Editor
 
 			switch (eventType)
 			{
+				case EventType.Repaint:
+					Repaint();
+					break;
+
 				case EventType.MouseDown:
 					HandleMousePress();
 					break;
 
-				case EventType.Repaint:
-					var tempContent = EditorGUIUtility.ObjectContent(serializedObjectProperty.objectReferenceValue, interfaceType);
-					var mousePosition = currentEvent.mousePosition;
-					Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, 1, DragAndDrop.activeControlID == controlID, position.Contains(mousePosition));
-
-					var buttonStyle = Styles.ObjectSelectorButton;
-					var selectorButtonRect = buttonStyle.margin.Remove(GetButtonRect(position));
-					buttonStyle.Draw(selectorButtonRect, GUIContent.none, controlID, DragAndDrop.activeControlID == controlID, selectorButtonRect.Contains(mousePosition));
+				case EventType.DragUpdated:
+				case EventType.DragPerform:
+					HandleDragging();
 					break;
 
 				case EventType.DragExited:
 					if (GUI.enabled)
 						HandleUtility.Repaint();
+					break;
 
+				case EventType.ValidateCommand:
+					ValidateEventCommand();
+					break;
+
+				case EventType.ExecuteCommand:
+					ExecuteEventCommand();
 					break;
 			}
 
 			//AssignValue(@object);
 			return @object;
 
-			void AssignValue(Object assignedObject)
+			void Repaint()
 			{
-				serializedObjectProperty.objectReferenceValue = assignedObject;
-				serializedObjectProperty.serializedObject.ApplyModifiedProperties();
+				var tempContent = EditorGUIUtility.ObjectContent(serializedObjectProperty.objectReferenceValue, interfaceType);
+				var mousePosition = currentEvent.mousePosition;
+				Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, 1, DragAndDrop.activeControlID == controlID, position.Contains(mousePosition));
+
+				var buttonStyle = Styles.ObjectSelectorButton;
+				var selectorButtonRect = buttonStyle.margin.Remove(GetButtonRect(position));
+				buttonStyle.Draw(selectorButtonRect, GUIContent.none, controlID, DragAndDrop.activeControlID == controlID, selectorButtonRect.Contains(mousePosition));
 			}
+
 
 			void HandleMousePress()
 			{
 				var mousePosition = currentEvent.mousePosition;
 				if (currentEvent.button != 0 || position.Contains(mousePosition) == false)
 					return;
-				
+
 				var selectorButtonRect = GetButtonRect(position);
 				EditorGUIUtility.editingTextField = false;
 				if (selectorButtonRect.Contains(mousePosition))
@@ -97,9 +111,13 @@ namespace Bipolar.Editor
 
 				void HandleObjectFieldPress()
 				{
+					if (@object == null)
+						return;
+
 					var clickedObject = @object;
 					if (clickedObject is Component component)
 						clickedObject = component.gameObject;
+
 					if (EditorGUI.showMixedValue)
 						return;
 
@@ -108,34 +126,97 @@ namespace Bipolar.Editor
 						case 1:
 							GUIUtility.keyboardControl = controlID;
 							EditorGUIUtility.PingObject(clickedObject);
-
+							currentEvent.Use();
 							break;
 
 						case 2:
-							if (clickedObject)
-							{
-
-							}
-
+							AssetDatabase.OpenAsset(clickedObject);
+							currentEvent.Use();
+							GUIUtility.ExitGUI();
 							break;
 					}
 				}
 			}
-		}
 
-
-		private static Rect GetObjectFieldThumbnailRect(Rect position, System.Type objType)
-		{
-			if (EditorGUIUtility.HasObjectThumbnail(objType) && position.height > 18f)
+		    void ValidateEventCommand()
 			{
-				float size = Mathf.Min(position.width, position.height);
-				position.height = size;
-				position.xMin = position.xMax - size;
+				if (GUIUtility.keyboardControl == controlID && IsDeleteCommand(currentEvent.commandName))
+					currentEvent.Use();
 			}
 
-			return position;
+			void ExecuteEventCommand()
+			{
+				if (GUIUtility.keyboardControl != controlID)
+					return;
+
+				if (IsDeleteCommand(currentEvent.commandName))
+				{
+					@object = null;
+					AssignValue(null);
+					GUI.changed = true;
+					currentEvent.Use();
+				}
+			}
+		
+			void HandleDragging()
+			{
+				if (GUI.enabled == false) 
+					return;
+
+				if (position.Contains(currentEvent.mousePosition) == false)
+					return;
+
+				var objectReferences = DragAndDrop.objectReferences;
+				if (objectReferences.Length < 1)
+					return;
+
+				var draggedObject = ValidateObject(objectReferences[0], interfaceType);
+				if (draggedObject == null)
+					return;
+
+				if (allowSceneObjects == false && EditorUtility.IsPersistent(draggedObject) == false)
+					return;
+
+
+				if (DragAndDrop.visualMode == DragAndDropVisualMode.None)
+					DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
+
+				if (currentEvent.type == EventType.DragPerform)
+				{
+					@object = draggedObject;
+					AssignValue(draggedObject);
+					GUI.changed = true;
+					DragAndDrop.AcceptDrag();
+					DragAndDrop.activeControlID = 0;
+				}
+				else
+				{
+					DragAndDrop.activeControlID = controlID;
+				}
+				currentEvent.Use();
+			}
+
+			Object ValidateObject(Object obj, System.Type type)
+			{
+				if (type.IsAssignableFrom(obj.GetType()))
+					return obj;
+
+				if (obj is GameObject gameObject)
+					return gameObject.GetComponent(type);
+
+				return null;
+			}
+
+
+			void AssignValue(Object assignedObject)
+			{
+				serializedObjectProperty.objectReferenceValue = assignedObject;
+				serializedObjectProperty.serializedObject.ApplyModifiedProperties();
+			}
 		}
 
+		private static bool IsDeleteCommand(string commandName) =>
+			commandName == "Delete" || commandName == "SoftDelete";
 
 		private static Rect GetButtonRect(Rect position) => new Rect(
 			position.xMax - InterfaceSelectorButtonWidth,
