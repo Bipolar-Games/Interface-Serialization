@@ -18,7 +18,7 @@ namespace Bipolar.Editor
 
 				if (type.IsGenericType)
 				{
-					if (type.GetGenericTypeDefinition() == typeof(Serialized<>))
+					if (type.GetGenericTypeDefinition() == typeof(Serialized<,>))
 						return type.GetGenericArguments()[0];
 
 					if (typeof(IEnumerable).IsAssignableFrom(type))
