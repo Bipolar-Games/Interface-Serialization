@@ -64,32 +64,32 @@ namespace Bipolar.Editor
 
 
 
-			AssignValue(serializedObjectProperty, @object);
+			AssignValue(@object);
 			return @object;
 
-			static void AssignValue(SerializedProperty property, Object @object)
+			void AssignValue(Object @object)
 			{
-				property.objectReferenceValue = @object;
-				property.serializedObject.ApplyModifiedProperties();
+				serializedObjectProperty.objectReferenceValue = @object;
+				serializedObjectProperty.serializedObject.ApplyModifiedProperties();
 			}
 
 			void HandleMousePress()
 			{
 				var mousePosition = currentEvent.mousePosition;
-				if (currentEvent.button == 0 && position.Contains(mousePosition))
+				if (currentEvent.button != 0 || position.Contains(mousePosition) == false)
+					return;
+				
+				var selectorButtonRect = GetButtonRect(position);
+				EditorGUIUtility.editingTextField = false;
+				if (selectorButtonRect.Contains(mousePosition))
 				{
-					var selectorButtonRect = GetButtonRect(position);
-					EditorGUIUtility.editingTextField = false;
-					if (selectorButtonRect.Contains(mousePosition))
+					if (GUI.enabled)
 					{
-						if (GUI.enabled)
-						{
-
-						}
-
-
+						InterfaceSelectorWindow.Show(interfaceType, @object, AssignValue);
 					}
-
+				}
+				else
+				{
 
 				}
 			}
