@@ -1,44 +1,95 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
+
+using Styles = Bipolar.Editor.InterfaceEditorStyles;
 
 namespace Bipolar.Editor
 {
+
 	public static class InterfaceEditorGUI
 	{
-		public const float InterfaceSelectorButtonWidth = 20;
+		public const float InterfaceSelectorButtonWidth = 19;
 
-		private static int s_ObjectFieldHash = "s_ObjectFieldHash".GetHashCode();
+		private static readonly int objectFieldHash = "s_ObjectFieldHash".GetHashCode();
 
-		private static GUIStyle buttonStyle = EditorStyles.objectField;
+		public static Object InterfaceField(Rect position, GUIContent label, Object @object, System.Type interfaceType, bool allowSceneObjects = true) => DoInterfaceField(position, label, null, @object, interfaceType, allowSceneObjects);
 
-		public static Object InterfaceField(Rect position, GUIContent label, Object @object, System.Type interfaceType, bool allowSceneObjects)
+		public static void InterfaceField(Rect position, GUIContent label, SerializedProperty serializedObjectProperty, System.Type interfaceType, bool allowSceneObjects = true) => DoInterfaceField(position, label, serializedObjectProperty, null, interfaceType, allowSceneObjects);
+
+		private static Object DoInterfaceField(Rect position, GUIContent label, SerializedProperty serializedObjectProperty, Object @object, System.Type interfaceType, bool allowSceneObjects)
 		{
+			if (interfaceType == default)
+				return default;
+
+			if (serializedObjectProperty == default && @object == default)
+				return default;
+
+			using var scope = new IconSizeScope(12, 12);
+
 			var currentEvent = Event.current;
 			var eventType = currentEvent.type;
+			int id = GUIUtility.GetControlID(hint: objectFieldHash, FocusType.Keyboard, position);
 
-			int id = GUIUtility.GetControlID(hint: s_ObjectFieldHash, FocusType.Keyboard, position);
-			position = EditorGUI.PrefixLabel(position, id, label);
+			if (serializedObjectProperty != null)
+				@object = serializedObjectProperty.objectReferenceValue;
 
-			position = GetObjectFieldThumbnailRect(position, interfaceType);
+			switch (eventType)
+			{
+				case EventType.MouseDown:
+					HandleMouseDown();
+					break;
 
-			var iconSize = EditorGUIUtility.GetIconSize();
+				case EventType.Repaint:
+					var tempContent = EditorGUIUtility.ObjectContent(serializedObjectProperty.objectReferenceValue, interfaceType);
+					var mousePosition = currentEvent.mousePosition;
+					Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, 1, DragAndDrop.activeControlID == id, position.Contains(mousePosition));
 
-			//switch (eventType)
-			//{
-			//	case EventType.Repaint:
+					var buttonStyle = Styles.ObjectSelectorButton;
+					var selectorButtonRect = buttonStyle.margin.Remove(GetButtonRect(position));
+					buttonStyle.Draw(selectorButtonRect, GUIContent.none, id, DragAndDrop.activeControlID == id, selectorButtonRect.Contains(mousePosition));
+					break;
 
-			//		EditorGUIUtility.ObjectContent(@object, interfaceType);
-			//		Rect position2 = buttonStyle.margin.Remove(GetButtonRect(objectFieldVisualType, position));
-			//		buttonStyle.Draw(position2, GUIContent.none, id, DragAndDrop.activeControlID == id, position2.Contains(Event.current.mousePosition));
-			//		break;
-			//}
-			EditorGUIUtility.SetIconSize(iconSize);
+				case EventType.DragExited:
+					if (GUI.enabled)
+						HandleUtility.Repaint();
+
+					break;
+			}
+
+
+
+
+
+			AssignValue(serializedObjectProperty, @object);
 			return @object;
+
+			static void AssignValue(SerializedProperty property, Object @object)
+			{
+				property.objectReferenceValue = @object;
+				property.serializedObject.ApplyModifiedProperties();
+			}
+
+			void HandleMouseDown()
+			{
+				var mousePosition = currentEvent.mousePosition;
+				if (currentEvent.button == 0 && position.Contains(mousePosition))
+				{
+					var selectorButtonRect = GetButtonRect(position);
+					EditorGUIUtility.editingTextField = false;
+					if (selectorButtonRect.Contains(mousePosition))
+					{
+						if (GUI.enabled)
+						{
+
+						}
+
+
+					}
+
+
+				}
+			}
 		}
-
-
-
 
 
 		private static Rect GetObjectFieldThumbnailRect(Rect position, System.Type objType)
@@ -54,59 +105,28 @@ namespace Bipolar.Editor
 		}
 
 
+		private static Rect GetButtonRect(Rect position) => new Rect(
+			position.xMax - InterfaceSelectorButtonWidth,
+			position.y,
+			InterfaceSelectorButtonWidth,
+			position.height);
 
-
-
-
-
-
-
-		public static void InterfaceField(Rect rect, GUIContent label, SerializedProperty serializedObjectProperty, System.Type interfaceType, bool allowSceneObjects)
+		internal struct IconSizeScope : System.IDisposable
 		{
-			//var objectFieldRect = new Rect(rect.x, rect.y, rect.width - InterfaceSelectorButtonWidth, rect.height);
-			//var interfaceButtonRect = new Rect(rect.x + objectFieldRect.width, rect.y, InterfaceSelectorButtonWidth, rect.height);
-			//serializedObjectProperty.objectReferenceValue = EditorGUI.ObjectField(objectFieldRect, label, serializedObjectProperty.objectReferenceValue, interfaceType, allowSceneObjects);
+			private readonly Vector2 originalIconSize;
 
-			if (interfaceType == default)
-				return;
-
-			var currentEvent = Event.current;
-			var eventType = currentEvent.type;
-			int id = GUIUtility.GetControlID(hint: s_ObjectFieldHash, FocusType.Keyboard, rect);
-
-			var @object = serializedObjectProperty.objectReferenceValue;
-
-
-			switch (eventType)
+			public IconSizeScope(Vector2 iconSize)
 			{
-				case EventType.Repaint:
-						var tempContent = EditorGUIUtility.ObjectContent(serializedObjectProperty.objectReferenceValue, interfaceType);
-						buttonStyle.Draw(EditorGUI.IndentedRect(rect), tempContent, 1, DragAndDrop.activeControlID == id, rect.Contains(Event.current.mousePosition));
-
-						//	if (GUI.Button(interfaceButtonRect, "I"))
-						//	{
-						//		Object objectReferenceValue = serializedObjectProperty.objectReferenceValue;
-						//		InterfaceSelectorWindow.Show(interfaceType, objectReferenceValue, (obj) => AssignValue(serializedObjectProperty, obj));
-						//	}
-						break;
-
-				case EventType.DragExited:
-					if (GUI.enabled)
-						HandleUtility.Repaint();
-					
-					break;
+				originalIconSize = EditorGUIUtility.GetIconSize();
+				EditorGUIUtility.SetIconSize(iconSize);
 			}
 
+			public IconSizeScope(float x, float y)
+				: this(new Vector2(x, y))
+			{ }
 
 
-			AssignValue(serializedObjectProperty, @object);
-
-
-			static void AssignValue(SerializedProperty property, Object @object)
-			{
-				property.objectReferenceValue = @object;
-				property.serializedObject.ApplyModifiedProperties();
-			}
+			public readonly void Dispose() => EditorGUIUtility.SetIconSize(originalIconSize);
 		}
 	}
 }
