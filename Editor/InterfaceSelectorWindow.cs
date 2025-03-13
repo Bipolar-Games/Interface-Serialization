@@ -20,7 +20,7 @@ namespace Bipolar.Editor
 			public InterfacePickerWindowData(System.Type interfaceType)
             {
 				filteredType = interfaceType;
-                assetsOfType = GetAssetsOfType(interfaceType);
+                assetsOfType = GetAssetsOfType(interfaceType).ToArray();
             }
         }
 
