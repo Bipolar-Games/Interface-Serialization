@@ -5,7 +5,6 @@ using Styles = Bipolar.Editor.InterfaceEditorStyles;
 
 namespace Bipolar.Editor
 {
-
 	public static class InterfaceEditorGUI
 	{
 		public const float InterfaceSelectorButtonWidth = 19;
@@ -75,13 +74,13 @@ namespace Bipolar.Editor
 			{
 				var tempContent = EditorGUIUtility.ObjectContent(serializedObjectProperty.objectReferenceValue, interfaceType);
 				var mousePosition = currentEvent.mousePosition;
-				Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, 1, DragAndDrop.activeControlID == controlID, position.Contains(mousePosition));
-
+				bool isDragged = DragAndDrop.activeControlID == controlID;
+				Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, controlID, isDragged, position.Contains(mousePosition));
+				
 				var buttonStyle = Styles.ObjectSelectorButton;
 				var selectorButtonRect = buttonStyle.margin.Remove(GetButtonRect(position));
-				buttonStyle.Draw(selectorButtonRect, GUIContent.none, controlID, DragAndDrop.activeControlID == controlID, selectorButtonRect.Contains(mousePosition));
+				buttonStyle.Draw(selectorButtonRect, GUIContent.none, controlID, isDragged, selectorButtonRect.Contains(mousePosition));
 			}
-
 
 			void HandleMousePress()
 			{
@@ -111,9 +110,6 @@ namespace Bipolar.Editor
 
 				void HandleObjectFieldPress()
 				{
-					if (@object == null)
-						return;
-
 					var clickedObject = @object;
 					if (clickedObject is Component component)
 						clickedObject = component.gameObject;
@@ -176,7 +172,6 @@ namespace Bipolar.Editor
 
 				if (allowSceneObjects == false && EditorUtility.IsPersistent(draggedObject) == false)
 					return;
-
 
 				if (DragAndDrop.visualMode == DragAndDropVisualMode.None)
 					DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
