@@ -13,11 +13,13 @@ namespace Bipolar.Editor
             public System.Type filteredType;
             public bool isFocused = false;
             public int tab;
-            public ScriptableObject[] assetsOfType;
 
-            public InterfacePickerWindowData(System.Type interfaceType)
+            private ScriptableObject[] assetsOfType;
+			public ScriptableObject[] AssetsOfType => assetsOfType;
+
+			public InterfacePickerWindowData(System.Type interfaceType)
             {
-                filteredType = interfaceType;
+				filteredType = interfaceType;
                 assetsOfType = GetAssetsOfType(interfaceType);
             }
         }
@@ -81,17 +83,7 @@ namespace Bipolar.Editor
 
         private static InterfacePickerWindowData GetData(System.Type interfaceType)
         {
-            if (windowsByType.TryGetValue(interfaceType, out var existingData))
-            {
-                if (existingData != null)
-                {
-                    existingData.isFocused = false;
-                    return existingData;
-                }
-            }
-
             var newData = new InterfacePickerWindowData(interfaceType);
-            windowsByType[interfaceType] = newData;
             return newData;
         }
 
@@ -159,7 +151,7 @@ namespace Bipolar.Editor
             {
                 pressedObject = null;
             }
-            foreach (var asset in data.assetsOfType)
+            foreach (var asset in data.AssetsOfType)
             {
                 if (asset.name.ToLower().Contains(searchFilter.ToLower()))
                 {
@@ -252,14 +244,13 @@ namespace Bipolar.Editor
             return wasPressed;
         }
 
-
         /// <summary>
         /// Used to get assets of a certain type and file extension from entire project
         /// </summary>
         /// <param name="type">The type to retrieve. eg typeof(GameObject).</param>
         /// <param name="fileExtension">The file extention the type uses eg ".prefab".</param>
         /// <returns>An Object array of assets.</returns>
-        public static ScriptableObject[] GetAssetsOfType(System.Type type, string fileExtension = "asset")
+        public static ICollection<ScriptableObject> GetAssetsOfType(System.Type type, string fileExtension = "asset")
         {
             var derivedTypes = TypeCache.GetTypesDerivedFrom(type);
             var filterBuilder = new StringBuilder();
@@ -285,7 +276,7 @@ namespace Bipolar.Editor
 
                 foundObjectsList.Add(asset);
             }
-            return foundObjectsList.ToArray();
+            return foundObjectsList;
         }
 
         private void OnLostFocus()
