@@ -1,5 +1,4 @@
 ﻿using UnityEditor;
-using UnityEditor.SearchService;
 using UnityEngine;
 
 using Styles = Bipolar.Editor.InterfaceEditorStyles;
@@ -11,8 +10,6 @@ namespace Bipolar.Editor
 		public const float InterfaceSelectorButtonWidth = 19;
 
 		private static readonly int objectFieldHash = "s_ObjectFieldHash".GetHashCode();
-
-
 
 		public static Object InterfaceField(Rect position, GUIContent label, Object @object, System.Type interfaceType, bool allowSceneObjects = true) => DoInterfaceField(position, label, null, @object, interfaceType, allowSceneObjects);
 
@@ -27,7 +24,6 @@ namespace Bipolar.Editor
 				throw new System.ArgumentNullException("Missing serialized object");
 
 			int controlID = GUIUtility.GetControlID(hint: objectFieldHash, FocusType.Keyboard, position);
-
 
 			position = EditorGUI.PrefixLabel(position, controlID, label);
 
@@ -139,26 +135,6 @@ namespace Bipolar.Editor
 				}
 			}
 
-			void ValidateEventCommand()
-			{
-				if (GUIUtility.keyboardControl == controlID && IsDeleteCommand(currentEvent.commandName))
-					currentEvent.Use();
-			}
-
-			void ExecuteEventCommand()
-			{
-				if (GUIUtility.keyboardControl != controlID)
-					return;
-
-				if (IsDeleteCommand(currentEvent.commandName))
-				{
-					@object = null;
-					AssignValue(null);
-					GUI.changed = true;
-					currentEvent.Use();
-				}
-			}
-
 			void HandleDragging()
 			{
 				if (GUI.enabled == false)
@@ -192,6 +168,26 @@ namespace Bipolar.Editor
 
 				DragAndDrop.activeControlID = performed ? 0 : controlID;
 				currentEvent.Use();
+			}
+
+			void ValidateEventCommand()
+			{
+				if (GUIUtility.keyboardControl == controlID && IsDeleteCommand(currentEvent.commandName))
+					currentEvent.Use();
+			}
+
+			void ExecuteEventCommand()
+			{
+				if (GUIUtility.keyboardControl != controlID)
+					return;
+
+				if (IsDeleteCommand(currentEvent.commandName))
+				{
+					@object = null;
+					AssignValue(null);
+					GUI.changed = true;
+					currentEvent.Use();
+				}
 			}
 
 			Object ValidateObject(Object obj, System.Type type)
@@ -261,7 +257,6 @@ namespace Bipolar.Editor
 			public IconSizeScope(float x, float y)
 				: this(new Vector2(x, y))
 			{ }
-
 
 			public readonly void Dispose() => EditorGUIUtility.SetIconSize(originalIconSize);
 		}

@@ -8,12 +8,12 @@ namespace Bipolar
     { }
     
     [System.Serializable]
-    public class Serialized<TInterface, TObject>
+    public class Serialized<TInterface, TSerialized>
         where TInterface : class
-        where TObject : Object
+        where TSerialized : Object
     {
         [SerializeField]
-        private TObject serializedObject;
+        private TSerialized serializedObject;
 
         private TInterface _value;
         public virtual TInterface Value
@@ -25,7 +25,7 @@ namespace Bipolar
             }
             set
             {
-                if (!(value is TObject @object))
+                if (!(value is TSerialized @object))
                     throw new System.InvalidCastException();
 
                 serializedObject = @object;
@@ -35,6 +35,6 @@ namespace Bipolar
 
         public System.Type Type => typeof(TInterface);
 
-        public static implicit operator TInterface(Serialized<TInterface, TObject> iface) => iface.Value;
+        public static implicit operator TInterface(Serialized<TInterface, TSerialized> iface) => iface.Value;
     }
 }
