@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEditor.SearchService;
 using UnityEngine;
 
 using Styles = Bipolar.Editor.InterfaceEditorStyles;
@@ -65,9 +66,13 @@ namespace Bipolar.Editor
 				case EventType.ExecuteCommand:
 					ExecuteEventCommand();
 					break;
+
+				case EventType.KeyDown:
+					if (GUIUtility.keyboardControl == controlID)
+						HandleKeyboardPress();
+					break;
 			}
 
-			//AssignValue(@object);
 			return @object;
 
 			void Repaint()
@@ -76,7 +81,7 @@ namespace Bipolar.Editor
 				var mousePosition = currentEvent.mousePosition;
 				bool isDragged = DragAndDrop.activeControlID == controlID;
 				Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, controlID, isDragged, position.Contains(mousePosition));
-				
+
 				var buttonStyle = Styles.ObjectSelectorButton;
 				var selectorButtonRect = buttonStyle.margin.Remove(GetButtonRect(position));
 				buttonStyle.Draw(selectorButtonRect, GUIContent.none, controlID, isDragged, selectorButtonRect.Contains(mousePosition));
@@ -134,7 +139,7 @@ namespace Bipolar.Editor
 				}
 			}
 
-		    void ValidateEventCommand()
+			void ValidateEventCommand()
 			{
 				if (GUIUtility.keyboardControl == controlID && IsDeleteCommand(currentEvent.commandName))
 					currentEvent.Use();
@@ -153,10 +158,10 @@ namespace Bipolar.Editor
 					currentEvent.Use();
 				}
 			}
-		
+
 			void HandleDragging()
 			{
-				if (GUI.enabled == false) 
+				if (GUI.enabled == false)
 					return;
 
 				if (position.Contains(currentEvent.mousePosition) == false)
@@ -176,18 +181,16 @@ namespace Bipolar.Editor
 				if (DragAndDrop.visualMode == DragAndDropVisualMode.None)
 					DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
 
-				if (currentEvent.type == EventType.DragPerform)
+				bool performed = currentEvent.type == EventType.DragPerform;
+				if (performed)
 				{
 					@object = draggedObject;
 					AssignValue(draggedObject);
 					GUI.changed = true;
 					DragAndDrop.AcceptDrag();
-					DragAndDrop.activeControlID = 0;
 				}
-				else
-				{
-					DragAndDrop.activeControlID = controlID;
-				}
+
+				DragAndDrop.activeControlID = performed ? 0 : controlID;
 				currentEvent.Use();
 			}
 
@@ -202,6 +205,15 @@ namespace Bipolar.Editor
 				return null;
 			}
 
+			void HandleKeyboardPress()
+			{
+				if (IsConfirmKeyboardEvent(currentEvent))
+				{
+					InterfaceSelectorWindow.Show(interfaceType, @object, AssignValue);
+					currentEvent.Use();
+					GUIUtility.ExitGUI();
+				}
+			}
 
 			void AssignValue(Object assignedObject)
 			{
@@ -218,6 +230,23 @@ namespace Bipolar.Editor
 			position.y,
 			InterfaceSelectorButtonWidth,
 			position.height);
+
+		private static bool IsConfirmKeyboardEvent(Event @event)
+		{
+			if (@event.alt || @event.command || @event.control || @event.shift)
+				return false;
+
+			var key = @event.keyCode;
+			switch (key)
+			{
+				case KeyCode.Return:
+				case KeyCode.Space:
+				case KeyCode.KeypadEnter:
+					return true;
+				default:
+					return false;
+			}
+		}
 
 		internal struct IconSizeScope : System.IDisposable
 		{
