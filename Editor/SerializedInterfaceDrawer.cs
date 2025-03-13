@@ -15,7 +15,7 @@ namespace Bipolar.Editor
 
 			var serializedObjectProperty = property.FindPropertyRelative(serializedObjectPropertyName);
 			var requiredType = InterfaceEditorUtility.GetRequiredType(fieldInfo);
-			InterfaceEditorGUI.InterfaceField(position, label, serializedObjectProperty, requiredType, true);
+			InterfaceEditorGUI.InterfaceField(position, label, serializedObjectProperty, requiredType);
 
 			EditorGUI.EndProperty();
 		}

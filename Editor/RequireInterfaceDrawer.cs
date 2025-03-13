@@ -16,7 +16,7 @@ namespace Bipolar.Editor
                 
                 var requiredAttribute = attribute as RequireInterfaceAttribute;
                 var requiredType = requiredAttribute.RequiredType;
-				InterfaceEditorGUI.InterfaceField(position, label, property, requiredType, true);
+				InterfaceEditorGUI.InterfaceField(position, label, property, requiredType);
 
                 EditorGUI.EndProperty();
             }
