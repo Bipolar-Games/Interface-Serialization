@@ -35,6 +35,10 @@ namespace Bipolar.Editor
 			if (serializedObjectProperty != null)
 				@object = serializedObjectProperty.objectReferenceValue;
 
+			var validatedObject = GetValidatedObject(@object, interfaceType);
+			if (@object != validatedObject)
+				AssignValue(validatedObject);
+
 			switch (eventType)
 			{
 				case EventType.Repaint:
@@ -73,7 +77,7 @@ namespace Bipolar.Editor
 
 			void Repaint()
 			{
-				var tempContent = EditorGUIUtility.ObjectContent(serializedObjectProperty.objectReferenceValue, interfaceType);
+				var tempContent = EditorGUIUtility.ObjectContent(@object, interfaceType);
 				var mousePosition = currentEvent.mousePosition;
 				bool isDragged = DragAndDrop.activeControlID == controlID;
 				Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, controlID, isDragged, position.Contains(mousePosition));
@@ -147,7 +151,7 @@ namespace Bipolar.Editor
 				if (objectReferences.Length < 1)
 					return;
 
-				var draggedObject = ValidateObject(objectReferences[0], interfaceType);
+				var draggedObject = GetValidatedObject(objectReferences[0], interfaceType);
 				if (draggedObject == null)
 					return;
 
@@ -190,8 +194,11 @@ namespace Bipolar.Editor
 				}
 			}
 
-			Object ValidateObject(Object obj, System.Type type)
+			static Object GetValidatedObject(Object obj, System.Type type)
 			{
+				if (obj == null)
+					return null;
+
 				if (type.IsAssignableFrom(obj.GetType()))
 					return obj;
 
@@ -213,6 +220,7 @@ namespace Bipolar.Editor
 
 			void AssignValue(Object assignedObject)
 			{
+				@object = assignedObject;
 				serializedObjectProperty.objectReferenceValue = assignedObject;
 				serializedObjectProperty.serializedObject.ApplyModifiedProperties();
 			}
