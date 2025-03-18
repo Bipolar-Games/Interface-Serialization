@@ -254,18 +254,17 @@ namespace Bipolar.Editor
         {
             var derivedTypes = TypeCache.GetTypesDerivedFrom(type);
             var filterBuilder = new StringBuilder();
-            foreach (var derivedType in derivedTypes)
-            {
-                if (derivedType.IsSubclassOf(typeof(ScriptableObject)))
-                    filterBuilder.Append($"t:{derivedType.Name} ");
-            }
-            if (filterBuilder.Length < 1)
-                filterBuilder.Append("t:");
-
+            //foreach (var derivedType in derivedTypes)
+            //{
+            //    if (derivedType.IsSubclassOf(typeof(ScriptableObject)))
+            //        filterBuilder.Append($"t:{derivedType.Name} ");
+            //}
+            //if (filterBuilder.Length < 1)
+            filterBuilder.Append($"t:{nameof(ScriptableObject)}");
             var foundObjectsList = new List<ScriptableObject>();
 
-            var assetsGuids = AssetDatabase.FindAssets(filterBuilder.ToString());
-            foreach (var assetGuid in assetsGuids)
+            var allAssetsGuids = AssetDatabase.FindAssets(filterBuilder.ToString());
+            foreach (var assetGuid in allAssetsGuids)
             {
                 var assetFilePath = AssetDatabase.GUIDToAssetPath(assetGuid);
                 var asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(assetFilePath);
