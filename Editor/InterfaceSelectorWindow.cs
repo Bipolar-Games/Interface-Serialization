@@ -6,6 +6,11 @@ using System.Linq;
 
 namespace Bipolar.Editor
 {
+    public static class InterfaceTypesCache
+    {
+
+    }
+
     public class InterfaceSelectorWindow : EditorWindow
     {
         private class InterfacePickerWindowData
@@ -88,36 +93,44 @@ namespace Bipolar.Editor
         }
 
         private static Component[] GetComponentsOfInterface(System.Type interfaceType)
-        {
-            GameObject[] allGameObjects;
-            var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
-            if (prefabStage)
-            {
-                var prefabRoot = prefabStage.prefabContentsRoot;
-                allGameObjects = prefabRoot.GetComponentsInChildren<Transform>()
-                    .Select(tf => tf.gameObject)
-                    .ToArray();
-            }
-            else
-            {
-                allGameObjects = FindObjectsOfType<GameObject>(true);
-            }
+		{
+			GameObject[] allGameObjects = GetAllGameObject();
 
-            var componentsOfInterface = new List<Component>();
+			var componentsOfInterface = new List<Component>();
 
-            var tempComponents = new List<Component>();
-            foreach (var gameObject in allGameObjects)
-            {
-                tempComponents.Clear();
-                gameObject.GetComponents(interfaceType, tempComponents);
+			var tempComponents = new List<Component>();
+			foreach (var gameObject in allGameObjects)
+			{
+				tempComponents.Clear();
+				gameObject.GetComponents(tempComponents);
                 foreach (var component in tempComponents)
-                    componentsOfInterface.Add(component);
+                    if (interfaceType.IsAssignableFrom(component.GetType()))
+                        componentsOfInterface.Add(component);
             }
 
-            return componentsOfInterface.ToArray();
-        }
+			return componentsOfInterface.ToArray();
+		}
 
-        private void OnGUI()
+		private static GameObject[] GetAllGameObject()
+		{
+			GameObject[] allGameObjects;
+			var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+			if (prefabStage)
+			{
+				var prefabRoot = prefabStage.prefabContentsRoot;
+				allGameObjects = prefabRoot.GetComponentsInChildren<Transform>()
+					.Select(tf => tf.gameObject)
+					.ToArray();
+			}
+			else
+			{
+				allGameObjects = FindObjectsOfType<GameObject>(true);
+			}
+
+			return allGameObjects;
+		}
+
+		private void OnGUI()
         {
             GUI.SetNextControlName(searchBoxName);
             searchFilter = EditorGUILayout.TextField(searchFilter, EditorStyles.toolbarSearchField);
