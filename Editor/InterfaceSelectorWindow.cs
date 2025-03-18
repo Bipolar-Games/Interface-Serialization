@@ -12,7 +12,7 @@ namespace Bipolar.Editor
         {
             public System.Type filteredType;
             public bool isFocused = false;
-            public int tab;
+            public static int tab;
 
             private ScriptableObject[] assetsOfType;
 			public ScriptableObject[] AssetsOfType => assetsOfType;
@@ -127,9 +127,10 @@ namespace Bipolar.Editor
                 data.isFocused = true;
             }
 
-            data.tab = GUILayout.Toolbar(data.tab, tabs, tabsLayout);
+            int tab = InterfacePickerWindowData.tab;
+			tab = GUILayout.Toolbar(tab, tabs, tabsLayout);
 
-            switch (data.tab)
+            switch (tab)
             {
                 case AssetsTab:
                     DrawAssetsPanel();
@@ -139,6 +140,7 @@ namespace Bipolar.Editor
                     DrawSceneObjectsPanel();
                     break;
             }
+            InterfacePickerWindowData.tab = tab;
         }
 
         private void DrawAssetsPanel()
