@@ -1,4 +1,4 @@
-# Interfaces Serialization
+# Interface Serialization
 
 ## Installation 
 There are no custom steps to adding the package to your project. Just choose one of following installation methods:
@@ -78,8 +78,7 @@ public class MyBehaviour : MonoBehaviour
 
 #### 2) Inheriting `Serialized<>` class
 
-If you are going to often reference your interface in many classes you might find it more convenient to create your own serialized class of interface by inheriting `Serialized<>` class.
-
+If you are going to reference your interface in many classes, you might find it more convenient to create your own serialized class of interface by inheriting `Serialized<>` class.
 
 ```cs
 using UnityEngine;
@@ -114,8 +113,8 @@ public class MyBehaviour : MonoBehaviour
 If you prefer using an attribute instead of `Serialized<>` class you can add the `RequireInterface` attribute to your `UnityEngine.Object` field. However this method requires casting your object every time you want to use a function of the interface.
 
 ```cs
-using Bipolar;
 using UnityEngine;
+using Bipolar;
 
 public class MyBehaviour : MonoBehaviour
 {
@@ -131,6 +130,24 @@ public class MyBehaviour : MonoBehaviour
 
 ### Inspector usage
 
-Regardless the field declaration method, the correctly configured field of interface will be displayed as shown in the picture.
+Regardless of the field declaration method, the correctly configured field of interface will be displayed as shown in the picture.
 
 ![image](https://github.com/user-attachments/assets/23727899-8c6d-40d2-ae25-bb860b7ec003)
+
+#### Drag & Drop
+
+You can drag and drop into the field all objects implementing your interface, including:
+- ScriptableObjects implementing the interface
+- Components implementing the interface
+- GameObjects containing such Component
+- prefabs whose root GameObject contains such Component
+
+#### Object Selector
+
+You can also find the available objects in custom Object Selector window, which can be opened by pressing the default Object Selector Button. The Object Selector displays prefabs and ScriptableObjects under 'Assets' tab and Components in the scene under the 'Scene' tab.
+
+![image](https://github.com/user-attachments/assets/65514655-23e2-4617-bca9-ebdff2465262)
+![image](https://github.com/user-attachments/assets/690786ff-8bea-418f-a592-37a87c4c8c42)
+
+
+
