@@ -1,98 +1,110 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
 namespace Bipolar.Editor
 {
-    public static class InterfaceTypesCache
-    {
+	public static class InterfaceTypesCache
+	{
+		private static TypeCache.TypeCollection allScriptableObjectTypes = TypeCache.GetTypesDerivedFrom<ScriptableObject>();
+		private static readonly Dictionary<System.Type, System.Type[]> objectTypesAssignableTo = new Dictionary<System.Type, System.Type[]>();
 
-    }
+		public static System.Type[] GetScriptableObjectTypesAssignableTo(System.Type interfaceType)
+		{
+			if (objectTypesAssignableTo.TryGetValue(interfaceType, out var assignableTypes) == false)
+			{
+				assignableTypes = allScriptableObjectTypes
+					.Where(type => interfaceType.IsAssignableFrom(type))
+					.ToArray();
+				objectTypesAssignableTo.Add(interfaceType, assignableTypes);
+			}
+			return assignableTypes;
+		}
+	}
 
-    public class InterfaceSelectorWindow : EditorWindow
-    {
-        private class InterfacePickerWindowData
-        {
-            public System.Type filteredType;
-            public bool isFocused = false;
-            public static int tab;
+	public class InterfaceSelectorWindow : EditorWindow
+	{
+		private class InterfacePickerWindowData
+		{
+			public System.Type filteredType;
+			public bool isFocused = false;
+			public static int tab;
 
-            private Object[] assetsOfType;
+			private Object[] assetsOfType;
 			public Object[] AssetsOfType => assetsOfType;
 
 			public InterfacePickerWindowData(System.Type interfaceType)
-            {
+			{
 				filteredType = interfaceType;
-                assetsOfType = GetAssetsOfType(interfaceType).ToArray();
-            }
-        }
+				assetsOfType = GetAssetsOfType(interfaceType).ToArray();
+			}
+		}
 
-        #region Constants
-        private const string noneObjectName = "None";
-        private const string searchBoxName = "searchBox";
-        private static readonly string[] tabs = { "Assets", "Scene" };
-        private static readonly GUILayoutOption[] tabsLayout = { GUILayout.MaxWidth(110) };
-        private static GUIStyle _selectedStyle;
-        private static GUIStyle SelectedStyle
-        {
-            get
-            {
-                if (_selectedStyle == null || _selectedStyle.normal.background == null)
-                {
-                    var backgroundTexture = new Texture2D(1, 1);
-                    backgroundTexture.SetPixel(0, 0, new Color32(62, 95, 150, 255));
-                    backgroundTexture.Apply();
+		#region Constants
+		private const string noneObjectName = "None";
+		private const string searchBoxName = "searchBox";
+		private static readonly string[] tabs = { "Assets", "Scene" };
+		private static readonly GUILayoutOption[] tabsLayout = { GUILayout.MaxWidth(110) };
+		private static GUIStyle _selectedStyle;
+		private static GUIStyle SelectedStyle
+		{
+			get
+			{
+				if (_selectedStyle == null || _selectedStyle.normal.background == null)
+				{
+					var backgroundTexture = new Texture2D(1, 1);
+					backgroundTexture.SetPixel(0, 0, new Color32(62, 95, 150, 255));
+					backgroundTexture.Apply();
 
-                    _selectedStyle = new GUIStyle(EditorStyles.label);
-                    _selectedStyle.name = "Selected";
-                    _selectedStyle.normal.textColor = Color.white;
-                    _selectedStyle.normal.background = backgroundTexture;
-                }
-                return _selectedStyle;
-            }
-        }
+					_selectedStyle = new GUIStyle(EditorStyles.label);
+					_selectedStyle.name = "Selected";
+					_selectedStyle.normal.textColor = Color.white;
+					_selectedStyle.normal.background = backgroundTexture;
+				}
+				return _selectedStyle;
+			}
+		}
 
-        private const int AssetsTab = 0;
-        private const int SceneObjectsTab = 1;
+		private const int AssetsTab = 0;
+		private const int SceneObjectsTab = 1;
 
-        #endregion
+		#endregion
 
-        private readonly static Dictionary<System.Type, InterfacePickerWindowData> windowsByType = new Dictionary<System.Type, InterfacePickerWindowData>();
+		private readonly static Dictionary<System.Type, InterfacePickerWindowData> windowsByType = new Dictionary<System.Type, InterfacePickerWindowData>();
 
-        private InterfacePickerWindowData data;
-        private float assetsViewScrollAmount;
-        private float sceneObjectsViewScrollAmount;
-        private Object selectedObject;
-        private string searchFilter = "";
-        private Component[] componentsOfInterface;
-        private System.Action<Object> OnClosed;
+		private InterfacePickerWindowData data;
+		private float assetsViewScrollAmount;
+		private float sceneObjectsViewScrollAmount;
+		private Object selectedObject;
+		private string searchFilter = "";
+		private Component[] componentsOfInterface;
+		private System.Action<Object> OnClosed;
 
-        public static void Show(System.Type interfaceType, Object selectedObject, System.Action<Object> onClosed = null)
-        {
-            var window = Get(interfaceType);
-            window.selectedObject = selectedObject;
-            window.ShowUtility();
-            window.OnClosed = onClosed;
-        }
+		public static void Show(System.Type interfaceType, Object selectedObject, System.Action<Object> onClosed = null)
+		{
+			var window = Get(interfaceType);
+			window.selectedObject = selectedObject;
+			window.ShowUtility();
+			window.OnClosed = onClosed;
+		}
 
-        private static InterfaceSelectorWindow Get(System.Type interfaceType)
-        {
-            var window = CreateInstance<InterfaceSelectorWindow>();
-            window.titleContent = new GUIContent($"Select {interfaceType.Name}");
-            window.data = GetData(interfaceType);
-            window.componentsOfInterface = GetComponentsOfInterface(interfaceType);
-            return window;
-        }
+		private static InterfaceSelectorWindow Get(System.Type interfaceType)
+		{
+			var window = CreateInstance<InterfaceSelectorWindow>();
+			window.titleContent = new GUIContent($"Select {interfaceType.Name}");
+			window.data = GetData(interfaceType);
+			window.componentsOfInterface = GetComponentsOfInterface(interfaceType);
+			return window;
+		}
 
-        private static InterfacePickerWindowData GetData(System.Type interfaceType)
-        {
-            var newData = new InterfacePickerWindowData(interfaceType);
-            return newData;
-        }
+		private static InterfacePickerWindowData GetData(System.Type interfaceType)
+		{
+			var newData = new InterfacePickerWindowData(interfaceType);
+			return newData;
+		}
 
-        private static Component[] GetComponentsOfInterface(System.Type interfaceType)
+		private static Component[] GetComponentsOfInterface(System.Type interfaceType)
 		{
 			GameObject[] allGameObjects = GetAllGameObject();
 
@@ -103,10 +115,10 @@ namespace Bipolar.Editor
 			{
 				tempComponents.Clear();
 				gameObject.GetComponents(tempComponents);
-                foreach (var component in tempComponents)
-                    if (interfaceType.IsAssignableFrom(component.GetType()))
-                        componentsOfInterface.Add(component);
-            }
+				foreach (var component in tempComponents)
+					if (interfaceType.IsAssignableFrom(component.GetType()))
+						componentsOfInterface.Add(component);
+			}
 
 			return componentsOfInterface.ToArray();
 		}
@@ -131,166 +143,165 @@ namespace Bipolar.Editor
 		}
 
 		private void OnGUI()
-        {
-            GUI.SetNextControlName(searchBoxName);
-            searchFilter = EditorGUILayout.TextField(searchFilter, EditorStyles.toolbarSearchField);
-            if (data.isFocused == false)
-            {
-                GUI.FocusControl(searchBoxName);
-                data.isFocused = true;
-            }
+		{
+			GUI.SetNextControlName(searchBoxName);
+			searchFilter = EditorGUILayout.TextField(searchFilter, EditorStyles.toolbarSearchField);
+			if (data.isFocused == false)
+			{
+				GUI.FocusControl(searchBoxName);
+				data.isFocused = true;
+			}
 
-            int tab = InterfacePickerWindowData.tab;
+			int tab = InterfacePickerWindowData.tab;
 			tab = GUILayout.Toolbar(tab, tabs, tabsLayout);
 
-            switch (tab)
-            {
-                case AssetsTab:
-                    DrawAssetsPanel();
-                    break;
+			switch (tab)
+			{
+				case AssetsTab:
+					DrawAssetsPanel();
+					break;
 
-                case SceneObjectsTab:
-                    DrawSceneObjectsPanel();
-                    break;
-            }
-            InterfacePickerWindowData.tab = tab;
-        }
+				case SceneObjectsTab:
+					DrawSceneObjectsPanel();
+					break;
+			}
+			InterfacePickerWindowData.tab = tab;
+		}
 
-        private void DrawAssetsPanel()
-        {
-            assetsViewScrollAmount = EditorGUILayout.BeginScrollView(new Vector2(0, assetsViewScrollAmount)).y;
+		private void DrawAssetsPanel()
+		{
+			assetsViewScrollAmount = EditorGUILayout.BeginScrollView(new Vector2(0, assetsViewScrollAmount)).y;
 
-            EditorGUIUtility.SetIconSize(new Vector2(16, 16));
-            var pressedObject = selectedObject;
-            if (DrawAssetListItem(null))
-            {
-                pressedObject = null;
-            }
-            foreach (var asset in data.AssetsOfType)
-            {
-                if (asset.name.ToLower().Contains(searchFilter.ToLower()))
-                {
-                    if (asset is ScriptableObject scriptableObject)
-                    {
-                        if (DrawAssetListItem(scriptableObject))
-                        {
-                            pressedObject = asset;
-                        }
-                    }
-                    else if (asset is Component component)
-                    {
-                        if (DrawComponentListItem(component))
-                        {
-                            pressedObject = asset;
-                        }
-                    }
-                }
-            }
-            EditorGUIUtility.SetIconSize(Vector2.zero);
-            EditorGUILayout.EndScrollView();
+			var initialIconSize = EditorGUIUtility.GetIconSize();
+			EditorGUIUtility.SetIconSize(new Vector2(16, 16));
+			var pressedObject = selectedObject;
+			if (DrawAssetListItem(null))
+			{
+				pressedObject = null;
+			}
+			foreach (var asset in data.AssetsOfType)
+			{
+				if (asset.name.ToLower().Contains(searchFilter.ToLower()))
+				{
+					bool hasPressed = false;
+					if (asset is ScriptableObject scriptableObject)
+					{
+						hasPressed |= DrawAssetListItem(scriptableObject);
+					}
+					else if (asset is Component component)
+					{
+						hasPressed |= DrawComponentListItem(component);
+					}
 
-            if (selectedObject == pressedObject && Event.current.clickCount > 1)
-            {
-                Event.current.clickCount = 0;
-                Close();
-            }
+					if (hasPressed)
+						pressedObject = asset;
+				}
+			}
+			EditorGUIUtility.SetIconSize(initialIconSize);
+			EditorGUILayout.EndScrollView();
 
-            selectedObject = pressedObject;
-        }
+			if (selectedObject == pressedObject && Event.current.clickCount > 1)
+			{
+				Event.current.clickCount = 0;
+				Close();
+			}
 
-        private void DrawSceneObjectsPanel()
-        {
-            sceneObjectsViewScrollAmount = EditorGUILayout.BeginScrollView(new Vector2(0, sceneObjectsViewScrollAmount)).y;
-            EditorGUIUtility.SetIconSize(new Vector2(16, 16));
-            var pressedObject = selectedObject;
+			selectedObject = pressedObject;
+		}
 
-            if (DrawComponentListItem(null))
-                pressedObject = null;
-            
-            foreach (var component in componentsOfInterface)
-            {
-                if (component.name.ToLower().Contains(searchFilter.ToLower()))
-                {
-                    if (DrawComponentListItem(component))
-                    {
-                        pressedObject = component;
-                    }
-                }
-            }
+		private void DrawSceneObjectsPanel()
+		{
+			sceneObjectsViewScrollAmount = EditorGUILayout.BeginScrollView(new Vector2(0, sceneObjectsViewScrollAmount)).y;
 
-            EditorGUIUtility.SetIconSize(Vector2.zero);
-            EditorGUILayout.EndScrollView();
+			var initialIconSize = EditorGUIUtility.GetIconSize();
+			EditorGUIUtility.SetIconSize(new Vector2(16, 16));
+			var pressedObject = selectedObject;
 
-            if (selectedObject == pressedObject && Event.current.clickCount > 1)
-            {
-                Event.current.clickCount = 0;
-                Close();
-            }
+			if (DrawComponentListItem(null))
+				pressedObject = null;
 
-            selectedObject = pressedObject;
-        }
+			foreach (var component in componentsOfInterface)
+			{
+				if (component.name.ToLower().Contains(searchFilter.ToLower()))
+				{
+					if (DrawComponentListItem(component))
+					{
+						pressedObject = component;
+					}
+				}
+			}
 
-        private bool DrawAssetListItem(ScriptableObject asset)
-        {
-            bool wasPressed = false;
-            GUILayout.BeginHorizontal();
+			EditorGUIUtility.SetIconSize(initialIconSize);
+			EditorGUILayout.EndScrollView();
 
-            var image = AssetPreview.GetMiniThumbnail(asset);
-            GUILayout.Space(image ? 20 : 36);
-            string name = asset ? asset.name : noneObjectName;
-            var style = asset == selectedObject ? SelectedStyle : EditorStyles.label;
-            if (GUILayout.Button(new GUIContent(name, image), style))
-                wasPressed = true;
+			if (selectedObject == pressedObject && Event.current.clickCount > 1)
+			{
+				Event.current.clickCount = 0;
+				Close();
+			}
 
-            GUILayout.EndHorizontal();
-            return wasPressed;
-        }
+			selectedObject = pressedObject;
+		}
 
-        private bool DrawComponentListItem(Component component)
-        {
-            bool wasPressed = false;
-            GUILayout.BeginHorizontal();
-            var objectContent = EditorGUIUtility.ObjectContent(component, typeof(GameObject));
-            objectContent.text = component 
-                ? $"{component.name} ({ObjectNames.NicifyVariableName(component.GetType().Name)})"
-                : noneObjectName;
-            var style = EditorStyles.label;
-            
-            if (selectedObject == component)
-                style = SelectedStyle;
+		private bool DrawAssetListItem(ScriptableObject asset)
+		{
+			bool wasPressed = false;
+			GUILayout.BeginHorizontal();
 
-            GUILayout.Space(20);
-            if (GUILayout.Button(objectContent, style))
-                wasPressed = true;
+			var image = AssetPreview.GetMiniThumbnail(asset);
+			GUILayout.Space(image ? 20 : 36);
+			string name = asset ? asset.name : noneObjectName;
+			var style = asset == selectedObject ? SelectedStyle : EditorStyles.label;
+			if (GUILayout.Button(new GUIContent(name, image), style))
+				wasPressed = true;
 
-            GUILayout.EndHorizontal();
-            return wasPressed;
-        }
+			GUILayout.EndHorizontal();
+			return wasPressed;
+		}
 
-        public static ICollection<Object> GetAssetsOfType(System.Type type)
-        {
-            //var derivedTypes = TypeCache.GetTypesDerivedFrom(type);
-            //foreach (var derivedType in derivedTypes)
-            //{
-            //    if (derivedType.IsSubclassOf(typeof(ScriptableObject)))
-            //        filterBuilder.Append($"t:{derivedType.Name} ");
-            //}
-            //if (filterBuilder.Length < 1)
+		private bool DrawComponentListItem(Component component)
+		{
+			bool wasPressed = false;
+			GUILayout.BeginHorizontal();
+			var objectContent = EditorGUIUtility.ObjectContent(component, typeof(GameObject));
+			objectContent.text = component
+				? $"{component.name} ({ObjectNames.NicifyVariableName(component.GetType().Name)})"
+				: noneObjectName;
+			var style = EditorStyles.label;
 
-            var foundObjectsList = new List<Object>();
+			if (selectedObject == component)
+				style = SelectedStyle;
 
-            var allScriptableObjectsGuids = AssetDatabase.FindAssets($"t:{nameof(ScriptableObject)}");
-            foreach (var assetGuid in allScriptableObjectsGuids)
-            {
-                var assetFilePath = AssetDatabase.GUIDToAssetPath(assetGuid);
-                var asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(assetFilePath);
-                if (asset == null)
-                    continue;
-                else if (type.IsAssignableFrom(asset.GetType()) == false)
-                    continue;
+			GUILayout.Space(20);
+			if (GUILayout.Button(objectContent, style))
+				wasPressed = true;
 
-                foundObjectsList.Add(asset);
-            }
+			GUILayout.EndHorizontal();
+			return wasPressed;
+		}
+
+		public static ICollection<Object> GetAssetsOfType(System.Type type)
+		{
+			var foundObjectsList = new List<Object>();
+
+			var derivedTypes = InterfaceTypesCache.GetScriptableObjectTypesAssignableTo(type);
+			if (derivedTypes.Length > 0)
+			{
+				var filterBuilder = new System.Text.StringBuilder();
+				foreach (var derivedType in derivedTypes)
+					filterBuilder.Append($"t:{derivedType.Name} ");
+
+				var allAssetsOfInterface = AssetDatabase.FindAssets(filterBuilder.ToString());
+				foreach (var assetGuid in allAssetsOfInterface)
+				{
+					var assetFilePath = AssetDatabase.GUIDToAssetPath(assetGuid);
+					var asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(assetFilePath);
+					if (asset == null)
+						continue;
+
+					foundObjectsList.Add(asset);
+				}
+			}
 
 			var allPrefabsGuids = AssetDatabase.FindAssets("t:Prefab");
 			foreach (var assetGuid in allPrefabsGuids)
@@ -300,21 +311,21 @@ namespace Bipolar.Editor
 				if (prefab == null)
 					continue;
 
-                var components = prefab.GetComponents(type);
-                foundObjectsList.AddRange(components);
+				var components = prefab.GetComponents(type);
+				foundObjectsList.AddRange(components);
 			}
 			return foundObjectsList;
-        }
+		}
 
-        private void OnLostFocus()
-        {
-            Close();
-        }
+		private void OnLostFocus()
+		{
+			Close();
+		}
 
-        private void OnDestroy()
-        {
-            OnClosed?.Invoke(selectedObject);
-            OnClosed = null;
-        }
-    }
+		private void OnDestroy()
+		{
+			OnClosed?.Invoke(selectedObject);
+			OnClosed = null;
+		}
+	}
 }
