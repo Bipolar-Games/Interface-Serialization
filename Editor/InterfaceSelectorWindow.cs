@@ -19,8 +19,8 @@ namespace Bipolar.Editor
             public bool isFocused = false;
             public static int tab;
 
-            private ScriptableObject[] assetsOfType;
-			public ScriptableObject[] AssetsOfType => assetsOfType;
+            private Object[] assetsOfType;
+			public Object[] AssetsOfType => assetsOfType;
 
 			public InterfacePickerWindowData(System.Type interfaceType)
             {
@@ -170,9 +170,19 @@ namespace Bipolar.Editor
             {
                 if (asset.name.ToLower().Contains(searchFilter.ToLower()))
                 {
-                    if (DrawAssetListItem(asset))
+                    if (asset is ScriptableObject scriptableObject)
                     {
-                        pressedObject = asset;
+                        if (DrawAssetListItem(scriptableObject))
+                        {
+                            pressedObject = asset;
+                        }
+                    }
+                    else if (asset is Component component)
+                    {
+                        if (DrawComponentListItem(component))
+                        {
+                            pressedObject = asset;
+                        }
                     }
                 }
             }
@@ -193,17 +203,15 @@ namespace Bipolar.Editor
             sceneObjectsViewScrollAmount = EditorGUILayout.BeginScrollView(new Vector2(0, sceneObjectsViewScrollAmount)).y;
             EditorGUIUtility.SetIconSize(new Vector2(16, 16));
             var pressedObject = selectedObject;
-			//var listOfItems = new List<(GUIContent label, Object @object)>();
-			//listOfItems.Add((new GUIContent(noneObjectName, null, null), null));
 
-            if (DrawSceneObjectListItem(null))
+            if (DrawComponentListItem(null))
                 pressedObject = null;
             
             foreach (var component in componentsOfInterface)
             {
                 if (component.name.ToLower().Contains(searchFilter.ToLower()))
                 {
-                    if (DrawSceneObjectListItem(component))
+                    if (DrawComponentListItem(component))
                     {
                         pressedObject = component;
                     }
@@ -238,7 +246,7 @@ namespace Bipolar.Editor
             return wasPressed;
         }
 
-        private bool DrawSceneObjectListItem(Component component)
+        private bool DrawComponentListItem(Component component)
         {
             bool wasPressed = false;
             GUILayout.BeginHorizontal();
@@ -259,27 +267,20 @@ namespace Bipolar.Editor
             return wasPressed;
         }
 
-        /// <summary>
-        /// Used to get assets of a certain type and file extension from entire project
-        /// </summary>
-        /// <param name="type">The type to retrieve. eg typeof(GameObject).</param>
-        /// <param name="fileExtension">The file extention the type uses eg ".prefab".</param>
-        /// <returns>An Object array of assets.</returns>
-        public static ICollection<ScriptableObject> GetAssetsOfType(System.Type type, string fileExtension = "asset")
+        public static ICollection<Object> GetAssetsOfType(System.Type type)
         {
-            var derivedTypes = TypeCache.GetTypesDerivedFrom(type);
-            var filterBuilder = new StringBuilder();
+            //var derivedTypes = TypeCache.GetTypesDerivedFrom(type);
             //foreach (var derivedType in derivedTypes)
             //{
             //    if (derivedType.IsSubclassOf(typeof(ScriptableObject)))
             //        filterBuilder.Append($"t:{derivedType.Name} ");
             //}
             //if (filterBuilder.Length < 1)
-            filterBuilder.Append($"t:{nameof(ScriptableObject)}");
-            var foundObjectsList = new List<ScriptableObject>();
 
-            var allAssetsGuids = AssetDatabase.FindAssets(filterBuilder.ToString());
-            foreach (var assetGuid in allAssetsGuids)
+            var foundObjectsList = new List<Object>();
+
+            var allScriptableObjectsGuids = AssetDatabase.FindAssets($"t:{nameof(ScriptableObject)}");
+            foreach (var assetGuid in allScriptableObjectsGuids)
             {
                 var assetFilePath = AssetDatabase.GUIDToAssetPath(assetGuid);
                 var asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(assetFilePath);
@@ -290,7 +291,19 @@ namespace Bipolar.Editor
 
                 foundObjectsList.Add(asset);
             }
-            return foundObjectsList;
+
+			var allPrefabsGuids = AssetDatabase.FindAssets("t:Prefab");
+			foreach (var assetGuid in allPrefabsGuids)
+			{
+				var prefabFilePath = AssetDatabase.GUIDToAssetPath(assetGuid);
+				var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
+				if (prefab == null)
+					continue;
+
+                var components = prefab.GetComponents(type);
+                foundObjectsList.AddRange(components);
+			}
+			return foundObjectsList;
         }
 
         private void OnLostFocus()
