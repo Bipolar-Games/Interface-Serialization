@@ -3,6 +3,12 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 
+#if UNITY_2021_2_OR_NEWER
+using UnityEditor.SceneManagement;
+#else
+using UnityEditor.Experimental.SceneManagement;
+#endif
+
 namespace Bipolar.Editor
 {
 	public static class InterfaceTypesCache
@@ -126,7 +132,7 @@ namespace Bipolar.Editor
 		private static GameObject[] GetAllGameObject()
 		{
 			GameObject[] allGameObjects;
-			var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+			var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
 			if (prefabStage)
 			{
 				var prefabRoot = prefabStage.prefabContentsRoot;
