@@ -142,6 +142,8 @@ You can drag and drop into the field all objects implementing your interface, in
 - GameObjects containing such Component
 - prefabs whose root GameObject contains such Component
 
+![image](https://github.com/user-attachments/assets/d4ca99ed-1121-4828-9707-280fc88241a6)
+
 #### Object Selector
 
 You can also find the available objects in custom Object Selector window, which can be opened by pressing the default Object Selector Button. The Object Selector displays prefabs and ScriptableObjects under 'Assets' tab and Components in the scene under the 'Scene' tab.
