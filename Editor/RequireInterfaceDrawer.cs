@@ -13,7 +13,9 @@ namespace Bipolar.Editor
             if (property.propertyType == SerializedPropertyType.ObjectReference)
             {
                 EditorGUI.BeginProperty(position, label, property);
-                
+
+                var buttons = InterfaceEditorUtility.GetButtons(fieldInfo);
+
                 var requiredAttribute = attribute as RequireInterfaceAttribute;
                 var requiredType = requiredAttribute.RequiredType;
 				InterfaceEditorGUI.InterfaceField(position, label, property, requiredType);

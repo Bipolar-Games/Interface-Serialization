@@ -5,7 +5,7 @@ namespace Bipolar.Editor
 {
 	public static class InterfaceEditorUtility
 	{
-		public static System.Type GetRequiredType(FieldInfo fieldInfo)
+        public static System.Type GetRequiredType(FieldInfo fieldInfo)
 		{
 			var type = fieldInfo.FieldType;
 			while (type != null)
@@ -33,5 +33,13 @@ namespace Bipolar.Editor
 
 			return null;
 		}
-	}
+
+        public static InterfaceButtonType GetButtons(FieldInfo fieldInfo)
+        {
+            var buttonsAttribute = fieldInfo.GetCustomAttribute<InterfaceButtonAttribute>();
+
+            var buttons = buttonsAttribute?.ButtonType ?? InterfaceButtonType.None;
+            return buttons;
+        }
+    }
 }
