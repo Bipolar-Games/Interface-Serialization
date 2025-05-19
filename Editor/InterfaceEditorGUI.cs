@@ -9,7 +9,10 @@ namespace Bipolar.Editor
 	{
 		public const float InterfaceSelectorButtonWidth = 19;
 
-		private static readonly int objectFieldHash = "s_ObjectFieldHash".GetHashCode();
+		public const float CreateAssetButtonWidth = 52;
+		public const float AddComponentButtonWidth = 40;
+
+        private static readonly int objectFieldHash = "s_ObjectFieldHash".GetHashCode();
 
 		public static Object InterfaceField(Rect position, GUIContent label, Object @object, System.Type interfaceType, bool allowSceneObjects = true) => DoInterfaceField(position, label, null, @object, interfaceType, allowSceneObjects);
 
@@ -268,5 +271,17 @@ namespace Bipolar.Editor
 
 			public readonly void Dispose() => EditorGUIUtility.SetIconSize(originalIconSize);
 		}
-	}
+
+
+        public static Rect DrawSideButton(Rect position, string label, GUIStyle style, float width)
+        {
+            position.xMax -= width;
+            var buttonRect = new Rect(position.xMax, position.y, width, position.height);
+            if (GUI.Button(buttonRect, label, style))
+            {
+                Debug.Log($"{label} button clicked!");
+            }
+            return position;
+        }
+    }
 }
