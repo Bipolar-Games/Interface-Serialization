@@ -17,7 +17,8 @@ namespace Bipolar.Editor
                 var requiredAttribute = attribute as RequireInterfaceAttribute;
                 var requiredType = requiredAttribute.RequiredType;
 
-                var buttons = InterfaceEditorUtility.GetButtons(fieldInfo);
+                var buttons = requiredAttribute.ButtonType;
+                buttons = InterfaceEditorUtility.GetButtons(fieldInfo, buttons);
                 bool hasAddComponentButton = buttons.HasFlag(InterfaceButtonType.AddComponent);
                 bool hasCreateAssetButton = buttons.HasFlag(InterfaceButtonType.CreateAsset);
                 bool hasBothButtons = hasCreateAssetButton && hasAddComponentButton;
