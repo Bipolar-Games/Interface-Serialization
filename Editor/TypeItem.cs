@@ -14,6 +14,7 @@ namespace Bipolar.Editor
         public TypeItem(Type type, string name) : base(name)
         {
             Type = type;
+            icon = AssetPreview.GetMiniTypeThumbnail(type);
         }
     }
 }

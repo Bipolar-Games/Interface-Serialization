@@ -12,6 +12,7 @@ namespace Bipolar
         }
     }
 
+    [System.Flags]
     public enum InterfaceButtonType
     {
         None = 0,
