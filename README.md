@@ -151,10 +151,9 @@ You can also find the available objects in custom Object Selector window, which 
 
 
 ### Side Buttons
-
-#### Interface Button Attribute
 To make creation of new objects implementing the interface more streamlined side interface buttons were introduced. They allow to quickly create new objects without having to search through "Assets/Create" and "Add Component" menus, and automatically add object reference to the field.
 
+#### Interface Button Attribute
 To show side buttons with the interface field you need to apply `InterfaceButton` attribute to the field. The field must either inherit from `Serialized<,>` or have `RequiredInterface` attribute applied. The `InterfaceButton` attribute constructor requires specifying which buttons should be shown with `InterfaceButtonType`. Any combination of following types can be chosen:
 - `AddComponent` - creates a button which adds a Component implementing the interface to the GameObject and assigns it to the interface field
 - `CreateAsset` - creates a button that creates a new instance of ScriptableObject implementing the interface and assigns it to the interface field
