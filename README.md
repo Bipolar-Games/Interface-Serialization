@@ -74,8 +74,6 @@ public class MyBehaviour : MonoBehaviour
 }
 ```
 
-
-
 #### 2) Inheriting `Serialized<>` class
 
 If you are going to reference your interface in many classes, you might find it more convenient to create your own serialized class of interface by inheriting `Serialized<>` class.
@@ -152,4 +150,29 @@ You can also find the available objects in custom Object Selector window, which 
 ![image](https://github.com/user-attachments/assets/690786ff-8bea-418f-a592-37a87c4c8c42)
 
 
+### Side Buttons
 
+#### Interface Button Attribute
+To make creation of new objects implementing the interface more streamlined side interface buttons were introduced. They allow to quickly create new objects without having to search through "Assets/Create" and "Add Component" menus, and automatically add object reference to the field.
+
+To show side buttons with the interface field you need to apply `InterfaceButton` attribute to the field. The field must either inherit from `Serialized<,>` or have `RequiredInterface` attribute applied. The `InterfaceButton` attribute constructor requires specifying which buttons should be shown with `InterfaceButtonType`. Any combination of following types can be chosen:
+- `AddComponent` - creates a button which adds a Component implementing the interface to the GameObject and assigns it to the interface field
+- `CreateAsset` - creates a button that creates a new instance of ScriptableObject implementing the interface and assigns it to the interface field
+
+
+Chosing multiple types can be achieved by joining them with bitwise OR operator (`|`).
+For using both types of buttons `Both` type can be also used.
+ 
+```cs
+    [SerializeField, InterfaceButton(InterfaceButtonType.Both)]
+    private MyInterface mySerializedInterface;
+```
+
+#### Inspector Usage
+After applying the `InterfaceButton` attribute to the field side buttons will be shown beside the field in the Inspector, as displayed in the picture below.
+
+![image](https://github.com/user-attachments/assets/32f3167e-8fe3-44e1-b165-0550688c1b3d)
+
+Upon pressing any of the side buttons objects browser will show up, from which you can choose Component type you want to add or ScriptableObject type you want to create. Pressing the type name will result in addition/creation of the specified object. Types in the browser are also hierarchically grouped according to the `AddComponentMenu` attrbute for Components and `CreateAssetMenu` attribute in case of ScriptableObjects.
+
+![image](https://github.com/user-attachments/assets/f45ae35c-51b2-4579-8fd6-c6ed25171731)
