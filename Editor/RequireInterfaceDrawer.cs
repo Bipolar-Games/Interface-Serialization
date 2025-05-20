@@ -14,8 +14,10 @@ namespace Bipolar.Editor
             {
                 EditorGUI.BeginProperty(position, label, property);
 
-                var buttons = InterfaceEditorUtility.GetButtons(fieldInfo);
+                var requiredAttribute = attribute as RequireInterfaceAttribute;
+                var requiredType = requiredAttribute.RequiredType;
 
+                var buttons = InterfaceEditorUtility.GetButtons(fieldInfo);
                 bool hasAddComponentButton = buttons.HasFlag(InterfaceButtonType.AddComponent);
                 bool hasCreateAssetButton = buttons.HasFlag(InterfaceButtonType.CreateAsset);
                 bool hasBothButtons = hasCreateAssetButton && hasAddComponentButton;
@@ -23,17 +25,14 @@ namespace Bipolar.Editor
                 if (hasCreateAssetButton)
                 {
                     var buttonStyle = hasBothButtons ? EditorStyles.miniButtonRight : EditorStyles.miniButton;
-                    position = InterfaceEditorGUI.DrawSideButton(position, "Create", buttonStyle, InterfaceEditorGUI.CreateAssetButtonWidth);
+                    position = InterfaceEditorGUI.DrawSideButton(position, "Create", buttonStyle, InterfaceEditorGUI.CreateAssetButtonWidth, requiredType);
                 }
 
                 if (hasAddComponentButton)
                 {
                     var buttonStyle = hasBothButtons ? EditorStyles.miniButtonLeft : EditorStyles.miniButton;
-                    position = InterfaceEditorGUI.DrawSideButton(position, "Add", buttonStyle, InterfaceEditorGUI.AddComponentButtonWidth);
+                    position = InterfaceEditorGUI.DrawSideButton(position, "Add", buttonStyle, InterfaceEditorGUI.AddComponentButtonWidth, requiredType);
                 }
-
-                var requiredAttribute = attribute as RequireInterfaceAttribute;
-                var requiredType = requiredAttribute.RequiredType;
 				InterfaceEditorGUI.InterfaceField(position, label, property, requiredType);
 
                 EditorGUI.EndProperty();

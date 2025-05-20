@@ -13,8 +13,10 @@ namespace Bipolar.Editor
         {
             EditorGUI.BeginProperty(position, label, property);
 
-            var buttons = InterfaceEditorUtility.GetButtons(fieldInfo);
+            var serializedObjectProperty = property.FindPropertyRelative(serializedObjectPropertyName);
+            var requiredType = InterfaceEditorUtility.GetRequiredType(fieldInfo);
 
+            var buttons = InterfaceEditorUtility.GetButtons(fieldInfo);
             bool hasAddComponentButton = buttons.HasFlag(InterfaceButtonType.AddComponent);
             bool hasCreateAssetButton = buttons.HasFlag(InterfaceButtonType.CreateAsset);
             bool hasBothButtons = hasCreateAssetButton && hasAddComponentButton;
@@ -22,17 +24,15 @@ namespace Bipolar.Editor
             if (hasCreateAssetButton)
             {
                 var buttonStyle = hasBothButtons ? EditorStyles.miniButtonRight : EditorStyles.miniButton;
-                position = InterfaceEditorGUI.DrawSideButton(position, "Create", buttonStyle, InterfaceEditorGUI.CreateAssetButtonWidth);
+                position = InterfaceEditorGUI.DrawSideButton(position, "Create", buttonStyle, InterfaceEditorGUI.CreateAssetButtonWidth, requiredType);
             }
 
             if (hasAddComponentButton)
             {
-                var buttonStyle = hasBothButtons ? EditorStyles.miniButtonLeft : EditorStyles.miniButton; 
-                position = InterfaceEditorGUI.DrawSideButton(position, "Add", buttonStyle, InterfaceEditorGUI.AddComponentButtonWidth);
+                var buttonStyle = hasBothButtons ? EditorStyles.miniButtonLeft : EditorStyles.miniButton;
+                position = InterfaceEditorGUI.DrawSideButton(position, "Add", buttonStyle, InterfaceEditorGUI.AddComponentButtonWidth, requiredType);
             }
 
-            var serializedObjectProperty = property.FindPropertyRelative(serializedObjectPropertyName);
-            var requiredType = InterfaceEditorUtility.GetRequiredType(fieldInfo);
             InterfaceEditorGUI.InterfaceField(position, label, serializedObjectProperty, requiredType);
 
             EditorGUI.EndProperty();
