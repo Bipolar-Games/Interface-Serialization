@@ -3,7 +3,6 @@ using UnityEditor.IMGUI.Controls;
 using UnityEditor;
 using System.Linq;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Bipolar.Editor
 {
@@ -15,11 +14,11 @@ namespace Bipolar.Editor
 
         private readonly AdvancedDropdownItem root;
 
-        public TypeItemDropdown(Type requiredType) : base(new AdvancedDropdownState())
+        public TypeItemDropdown(Type requiredType, Type baseClass) : base(new AdvancedDropdownState())
         {
             SubcomponentType = requiredType;
             var types = TypeCache.GetTypesDerivedFrom(SubcomponentType)
-                .Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(Component)));
+                .Where(type => !type.IsAbstract && type.IsSubclassOf(baseClass));
             var builder = new TypeItemBuilder(GetRootItemName());
             PopulateBuilderWithTypes(builder, types);
             root = builder.Build();

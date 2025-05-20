@@ -5,7 +5,7 @@ namespace Bipolar.Editor
 {
     internal class CreateAssetDropdown : TypeItemDropdown
     {
-        public CreateAssetDropdown(Type requiredType) : base(requiredType)
+        public CreateAssetDropdown(Type requiredType) : base(requiredType, typeof(ScriptableObject))
         { }
      
         protected override string GetRootItemName() => "ScriptableObject";

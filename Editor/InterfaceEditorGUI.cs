@@ -284,7 +284,7 @@ namespace Bipolar.Editor
                 dropDownRect.width = Screen.width / 2f;
                 dropDownRect.height = position.height;
                 dropDownRect.center = oldPosition.center;
-                var dropdown = new AddComponentDropdown(type);
+                var dropdown = new CreateAssetDropdown(type);
                 dropdown.Show(dropDownRect);
             }
             return position;

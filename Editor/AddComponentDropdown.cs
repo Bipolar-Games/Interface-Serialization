@@ -5,7 +5,7 @@ namespace Bipolar.Editor
 {
     internal class AddComponentDropdown : TypeItemDropdown
     {
-        public AddComponentDropdown(Type requiredType) : base(requiredType)
+        public AddComponentDropdown(Type requiredType) : base(requiredType, typeof(Component))
         { }
 
         protected override string GetRootItemName() => "Component";
