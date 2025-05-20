@@ -164,8 +164,15 @@ Chosing multiple types can be achieved by joining them with bitwise OR operator 
 For using both types of buttons `Both` type can be also used.
  
 ```cs
-    [SerializeField, InterfaceButton(InterfaceButtonType.Both)]
-    private MyInterface mySerializedInterface;
+    [SerializeField, InterfaceButton(InterfaceButtonType.AddComponent)]
+    private Serialized<IMyInterface> mySerializedInterface;
+```
+
+Alternatively if you are using `RequireInterface` attribute you can specify the buttons in the second argument of the attribute constructor.
+
+```cs
+    [SerializeField, RequireInterface(typeof(IMyInterface), InterfaceButtonType.CreateAsset)]
+    private Object mySerializedInterface;
 ```
 
 #### Inspector Usage
