@@ -91,7 +91,7 @@ namespace Bipolar.Editor
                 Styles.ObjectField.Draw(EditorGUI.IndentedRect(position), tempContent, controlID, isDragged, position.Contains(mousePosition));
 
                 var buttonStyle = Styles.ObjectSelectorButton;
-                var selectorButtonRect = buttonStyle.margin.Remove(GetButtonRect(position));
+                var selectorButtonRect = buttonStyle.margin.Remove(GetSelectorButtonRect(position));
                 buttonStyle.Draw(selectorButtonRect, GUIContent.none, controlID, isDragged, selectorButtonRect.Contains(mousePosition));
             }
 
@@ -101,7 +101,7 @@ namespace Bipolar.Editor
                 if (currentEvent.button != 0 || position.Contains(mousePosition) == false)
                     return;
 
-                var selectorButtonRect = GetButtonRect(position);
+                var selectorButtonRect = GetSelectorButtonRect(position);
                 EditorGUIUtility.editingTextField = false;
                 if (selectorButtonRect.Contains(mousePosition))
                 {
@@ -237,7 +237,7 @@ namespace Bipolar.Editor
         private static bool IsDeleteCommand(string commandName) =>
             commandName == "Delete" || commandName == "SoftDelete";
 
-        private static Rect GetButtonRect(Rect position) => new Rect(
+        private static Rect GetSelectorButtonRect(Rect position) => new Rect(
             position.xMax - InterfaceSelectorButtonWidth,
             position.y,
             InterfaceSelectorButtonWidth,
@@ -284,10 +284,6 @@ namespace Bipolar.Editor
 
             void ShowDropDown()
             {
-                var dropDownRect = new Rect();
-                dropDownRect.width = Screen.width / 2f;
-                dropDownRect.height = position.height;
-                dropDownRect.center = position.center;
                 var dropdown = new AddComponentDropdown(requiredType);
                 dropdown.OnItemSelected += item =>
                 {
@@ -302,6 +298,8 @@ namespace Bipolar.Editor
                         serializedObjectProperty.serializedObject.ApplyModifiedProperties();
                     }
                 };
+
+                Rect dropDownRect = GetDropdownRect(position);
                 dropdown.Show(dropDownRect);
             }
         }
@@ -313,10 +311,6 @@ namespace Bipolar.Editor
 
             void ShowDropDown()
             {
-                var dropDownRect = new Rect();
-                dropDownRect.width = Screen.width / 2f;
-                dropDownRect.height = position.height;
-                dropDownRect.center = position.center;
                 var dropdown = new CreateAssetDropdown(requiredType);
                 dropdown.OnItemSelected += item =>
                 {
@@ -331,7 +325,7 @@ namespace Bipolar.Editor
                             folderPath = Path.GetDirectoryName(folderPath);
                     }
 
-                    var preferedAssetName = GetAssetFileName(item.Type);
+                    var preferedAssetName = InterfaceEditorUtility.GetAssetFileName(item.Type);
                     var assetPath = AssetDatabase.GenerateUniqueAssetPath($"{folderPath}/{preferedAssetName}.asset");
                     AssetDatabase.CreateAsset(createdAsset, assetPath);
                     AssetDatabase.SaveAssets();
@@ -339,11 +333,13 @@ namespace Bipolar.Editor
                     serializedObjectProperty.objectReferenceValue = createdAsset;
                     serializedObjectProperty.serializedObject.ApplyModifiedProperties();
                 };
+
+                Rect dropDownRect = GetDropdownRect(position);
                 dropdown.Show(dropDownRect);
             }
         }
 
-        private static Rect DrawSideButton(Rect position, string label, GUIStyle style, float width, System.Type type, System.Action onClick = null)
+        public static Rect DrawSideButton(Rect position, string label, GUIStyle style, float width, System.Type type, System.Action onClick = null)
         {
             position.xMax -= width;
             var buttonRect = new Rect(position.xMax, position.y, width, position.height);
@@ -354,17 +350,14 @@ namespace Bipolar.Editor
             return position;
         }
 
-        public static string GetAssetFileName(System.Type type)
+        public static Rect GetDropdownRect(Rect fieldRect)
         {
-            var attribute = type.GetCustomAttribute<CreateAssetMenuAttribute>();
-            if (attribute != null)
-            {
-                string fileName = attribute.fileName;
-                if (fileName != null)
-                    return fileName;
-            }
-
-            return "New " + ObjectNames.NicifyVariableName(type.Name);
+            var dropdownRect = new Rect();
+            dropdownRect.width = Screen.width / 2f;
+            dropdownRect.height = fieldRect.height;
+            dropdownRect.center = fieldRect.center;
+            return dropdownRect;
         }
+
     }
 }

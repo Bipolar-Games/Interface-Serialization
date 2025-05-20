@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 
 namespace Bipolar.Editor
 {
@@ -40,6 +42,19 @@ namespace Bipolar.Editor
 
             var buttons = buttonsAttribute?.ButtonType ?? InterfaceButtonType.None;
             return buttons;
+        }
+
+        public static string GetAssetFileName(System.Type type)
+        {
+            var attribute = type.GetCustomAttribute<CreateAssetMenuAttribute>();
+            if (attribute != null)
+            {
+                string fileName = attribute.fileName;
+                if (fileName != null)
+                    return fileName;
+            }
+
+            return "New " + ObjectNames.NicifyVariableName(type.Name);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Bipolar.Editor
 
         private readonly AdvancedDropdownItem root;
 
-        public TypeItemDropdown(Type requiredType, Type baseClass) : base(new AdvancedDropdownState())
+        internal TypeItemDropdown(Type requiredType, Type baseClass) : base(new AdvancedDropdownState())
         {
             SubcomponentType = requiredType;
             var types = TypeCache.GetTypesDerivedFrom(SubcomponentType)
