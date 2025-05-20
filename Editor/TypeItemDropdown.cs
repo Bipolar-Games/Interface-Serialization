@@ -36,7 +36,7 @@ namespace Bipolar.Editor
 
         protected abstract void AddTypeToBuilder(TypeItemBuilder builder, Type type);
 
-        protected override AdvancedDropdownItem BuildRoot() => root;
+        protected sealed override AdvancedDropdownItem BuildRoot() => root;
 
         protected override void ItemSelected(AdvancedDropdownItem item)
         {

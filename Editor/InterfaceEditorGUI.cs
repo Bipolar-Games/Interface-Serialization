@@ -1,4 +1,9 @@
-﻿using UnityEditor;
+﻿using System.IO;
+using System.Linq;
+using System.Reflection;
+using UnityEditor;
+using UnityEditor.Experimental;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 using Styles = Bipolar.Editor.InterfaceEditorStyles;
@@ -272,7 +277,7 @@ namespace Bipolar.Editor
             public readonly void Dispose() => EditorGUIUtility.SetIconSize(originalIconSize);
         }
 
-        public static Rect DrawAddComponentButton(Rect position, GUIStyle style, System.Type requiredType)
+        public static Rect DrawAddComponentButton(Rect position, SerializedProperty serializedObjectProperty, GUIStyle style, System.Type requiredType)
         {
             var rect = DrawSideButton(position, "Add", style, AddComponentButtonWidth, requiredType, ShowDropDown);
             return rect;
@@ -284,16 +289,27 @@ namespace Bipolar.Editor
                 dropDownRect.height = position.height;
                 dropDownRect.center = position.center;
                 var dropdown = new AddComponentDropdown(requiredType);
-                dropdown.OnItemSelected += item => { };
+                dropdown.OnItemSelected += item =>
+                {
+                    var gameObjects = serializedObjectProperty.serializedObject.targetObjects
+                        .Where(obj => obj is Component)
+                        .Select(c => ((Component)c).gameObject);
+
+                    foreach (var gameObject in gameObjects)
+                    {
+                        var addedComponent = ObjectFactory.AddComponent(gameObject, item.Type);
+                        serializedObjectProperty.objectReferenceValue = addedComponent;
+                        serializedObjectProperty.serializedObject.ApplyModifiedProperties();
+                    }
+                };
                 dropdown.Show(dropDownRect);
             }
         }
-        
-        public static Rect DrawCreateAssetButton(Rect position, GUIStyle style, System.Type requiredType)
+
+        public static Rect DrawCreateAssetButton(Rect position, SerializedProperty serializedObjectProperty, GUIStyle style, System.Type requiredType)
         {
             var rect = DrawSideButton(position, "Create", style, CreateAssetButtonWidth, requiredType, ShowDropDown);
             return rect;
-
 
             void ShowDropDown()
             {
@@ -302,7 +318,27 @@ namespace Bipolar.Editor
                 dropDownRect.height = position.height;
                 dropDownRect.center = position.center;
                 var dropdown = new CreateAssetDropdown(requiredType);
-                dropdown.OnItemSelected += item => { };
+                dropdown.OnItemSelected += item =>
+                {
+                    var createdAsset = ObjectFactory.CreateInstance(item.Type);
+
+                    string folderPath = "Assets";
+                    var selectedAssets = Selection.GetFiltered<Object>(SelectionMode.Assets);
+                    if (selectedAssets.Length > 0)
+                    {
+                        folderPath = AssetDatabase.GetAssetPath(selectedAssets[0]);
+                        if (!AssetDatabase.IsValidFolder(folderPath))
+                            folderPath = Path.GetDirectoryName(folderPath);
+                    }
+
+                    var preferedAssetName = GetAssetFileName(item.Type);
+                    var assetPath = AssetDatabase.GenerateUniqueAssetPath($"{folderPath}/{preferedAssetName}.asset");
+                    AssetDatabase.CreateAsset(createdAsset, assetPath);
+                    AssetDatabase.SaveAssets();
+                    EditorGUIUtility.PingObject(createdAsset);
+                    serializedObjectProperty.objectReferenceValue = createdAsset;
+                    serializedObjectProperty.serializedObject.ApplyModifiedProperties();
+                };
                 dropdown.Show(dropDownRect);
             }
         }
@@ -316,6 +352,19 @@ namespace Bipolar.Editor
                 onClick?.Invoke();
             }
             return position;
+        }
+
+        public static string GetAssetFileName(System.Type type)
+        {
+            var attribute = type.GetCustomAttribute<CreateAssetMenuAttribute>();
+            if (attribute != null)
+            {
+                string fileName = attribute.fileName;
+                if (fileName != null)
+                    return fileName;
+            }
+
+            return "New " + ObjectNames.NicifyVariableName(type.Name);
         }
     }
 }
