@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Bipolar.Editor
 {
-    internal abstract class TypeItemDropdown : AdvancedDropdown
+    internal abstract class AAA : AdvancedDropdown
     {
         public event Action<TypeItem> OnItemSelected;
 
@@ -15,7 +15,7 @@ namespace Bipolar.Editor
 
         private readonly AdvancedDropdownItem root;
 
-        public TypeItemDropdown(Type requiredType) : base(new AdvancedDropdownState())
+        public AAA(Type requiredType) : base(new AdvancedDropdownState())
         {
             SubcomponentType = requiredType;
             var types = TypeCache.GetTypesDerivedFrom(SubcomponentType)
