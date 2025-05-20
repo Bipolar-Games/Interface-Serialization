@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Bipolar.Editor
 {
-    internal class CreateAssetDropDownX : AAA
+    internal class CreateAssetDropdown : TypeItemDropdown
     {
-        public CreateAssetDropDownX(Type requiredType) : base(requiredType)
+        public CreateAssetDropdown(Type requiredType) : base(requiredType)
         { }
      
         protected override string GetRootItemName() => "ScriptableObject";

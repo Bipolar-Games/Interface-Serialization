@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Bipolar.Editor
 {
-    internal class AddComponentDropdown : AAA
+    internal class AddComponentDropdown : TypeItemDropdown
     {
         public AddComponentDropdown(Type requiredType) : base(requiredType)
         { }
