@@ -272,20 +272,48 @@ namespace Bipolar.Editor
             public readonly void Dispose() => EditorGUIUtility.SetIconSize(originalIconSize);
         }
 
-        public static Rect DrawSideButton(Rect position, string label, GUIStyle style, float width, System.Type type)
+        public static Rect DrawAddComponentButton(Rect position, GUIStyle style, System.Type requiredType)
         {
-            var oldPosition = position;
+            var rect = DrawSideButton(position, "Add", style, AddComponentButtonWidth, requiredType, ShowDropDown);
+            return rect;
 
-            position.xMax -= width;
-            var buttonRect = new Rect(position.xMax, position.y, width, position.height);
-            if (GUI.Button(buttonRect, label, style))
+            void ShowDropDown()
             {
                 var dropDownRect = new Rect();
                 dropDownRect.width = Screen.width / 2f;
                 dropDownRect.height = position.height;
-                dropDownRect.center = oldPosition.center;
-                var dropdown = new CreateAssetDropdown(type);
+                dropDownRect.center = position.center;
+                var dropdown = new AddComponentDropdown(requiredType);
+                dropdown.OnItemSelected += item => { };
                 dropdown.Show(dropDownRect);
+            }
+        }
+        
+        public static Rect DrawCreateAssetButton(Rect position, GUIStyle style, System.Type requiredType)
+        {
+            var rect = DrawSideButton(position, "Create", style, CreateAssetButtonWidth, requiredType, ShowDropDown);
+            return rect;
+
+
+            void ShowDropDown()
+            {
+                var dropDownRect = new Rect();
+                dropDownRect.width = Screen.width / 2f;
+                dropDownRect.height = position.height;
+                dropDownRect.center = position.center;
+                var dropdown = new CreateAssetDropdown(requiredType);
+                dropdown.OnItemSelected += item => { };
+                dropdown.Show(dropDownRect);
+            }
+        }
+
+        private static Rect DrawSideButton(Rect position, string label, GUIStyle style, float width, System.Type type, System.Action onClick = null)
+        {
+            position.xMax -= width;
+            var buttonRect = new Rect(position.xMax, position.y, width, position.height);
+            if (GUI.Button(buttonRect, label, style))
+            {
+                onClick?.Invoke();
             }
             return position;
         }
