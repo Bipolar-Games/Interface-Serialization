@@ -6,9 +6,12 @@ namespace Bipolar
     {
         public System.Type RequiredType { get; private set; }
 
-        public RequireInterfaceAttribute(System.Type type)
+        public InterfaceButtonType ButtonType { get; private set; }
+
+        public RequireInterfaceAttribute(System.Type type, InterfaceButtonType buttonType = InterfaceButtonType.None)
         {
             RequiredType = type;
+            ButtonType = buttonType;
         }
     }
 }

@@ -5,8 +5,10 @@ namespace Bipolar
     [System.Serializable]
     public class Serialized<TInterface> : Serialized<TInterface, Object>
         where TInterface : class
-    { }
-    
+    {
+        public static explicit operator Serialized<TInterface>(TInterface iface) => new Serialized<TInterface>() { Value = iface };
+    }
+
     [System.Serializable]
     public class Serialized<TInterface, TSerialized>
         where TInterface : class
@@ -36,5 +38,6 @@ namespace Bipolar
         public System.Type Type => typeof(TInterface);
 
         public static implicit operator TInterface(Serialized<TInterface, TSerialized> iface) => iface.Value;
+        public static explicit operator Serialized<TInterface, TSerialized>(TInterface iface) => new Serialized<TInterface, TSerialized>() { Value = iface };
     }
 }
