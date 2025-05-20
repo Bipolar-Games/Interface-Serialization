@@ -181,4 +181,5 @@ After applying the `InterfaceButton` attribute to the field side buttons will be
 
 Upon pressing any of the side buttons objects browser will show up, from which you can choose Component type you want to add or ScriptableObject type you want to create. Pressing the type name will result in addition/creation of the specified object. Types in the browser are also hierarchically grouped according to the `AddComponentMenu` attrbute for Components and `CreateAssetMenu` attribute in case of ScriptableObjects.
 
-![image](https://github.com/user-attachments/assets/f45ae35c-51b2-4579-8fd6-c6ed25171731)
+![2025-05-21 00-53-19](https://github.com/user-attachments/assets/f69af170-2846-42c0-9638-cbd27387269f)
+
