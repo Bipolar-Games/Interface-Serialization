@@ -16,7 +16,7 @@ namespace Bipolar.Editor
             {
                 var attribute = (AddComponentMenu)type.GetCustomAttributes(typeof(AddComponentMenu), true)[0];
                 var path = attribute.componentMenu;
-                string[] pathItems = path.Contains('/')
+                string[] pathItems = path.IndexOf('/') >= 0
                     ? path.Split('/')
                     : path.Split('\\');
 

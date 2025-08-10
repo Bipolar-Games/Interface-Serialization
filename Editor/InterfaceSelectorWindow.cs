@@ -187,7 +187,7 @@ namespace Bipolar.Editor
 			}
 			foreach (var asset in data.AssetsOfType)
 			{
-				if (asset.name.Contains(searchFilter, System.StringComparison.InvariantCultureIgnoreCase))
+				if (asset.name.IndexOf(searchFilter, System.StringComparison.InvariantCultureIgnoreCase) >= 0)
 				{
 					bool hasPressed = false;
 					if (asset is ScriptableObject scriptableObject)
@@ -228,7 +228,7 @@ namespace Bipolar.Editor
 
 			foreach (var component in componentsOfInterface)
 			{
-				if (component.name.Contains(searchFilter, System.StringComparison.InvariantCultureIgnoreCase))
+				if (component.name.IndexOf(searchFilter, System.StringComparison.InvariantCultureIgnoreCase) >= 0)
 				{
 					if (DrawComponentListItem(component))
 					{
