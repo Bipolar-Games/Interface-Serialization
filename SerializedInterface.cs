@@ -27,11 +27,15 @@ namespace Bipolar
             }
             set
             {
-                if (!(value is TSerialized @object))
+                if (value is TSerialized @object)
+                {
+                    serializedObject = @object;
+                    _value = value;
+                }
+                else
+                {
                     throw new System.InvalidCastException();
-
-                serializedObject = @object;
-                _value = value;
+                }
             }
         }
 
