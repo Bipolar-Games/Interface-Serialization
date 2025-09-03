@@ -122,7 +122,7 @@ namespace Bipolar.Editor
 				tempComponents.Clear();
 				gameObject.GetComponents(tempComponents);
 				foreach (var component in tempComponents)
-					if (interfaceType.IsAssignableFrom(component.GetType()))
+					if (component && interfaceType.IsAssignableFrom(component.GetType()))
 						componentsOfInterface.Add(component);
 			}
 
