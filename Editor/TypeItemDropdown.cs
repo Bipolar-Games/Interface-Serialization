@@ -18,6 +18,7 @@ namespace Bipolar.Editor
         {
             SubcomponentType = requiredType;
             var types = TypeCache.GetTypesDerivedFrom(SubcomponentType)
+                .Append(SubcomponentType)
                 .Where(type => !type.IsAbstract && type.IsSubclassOf(baseClass));
             var builder = new TypeItemBuilder(GetRootItemName());
             PopulateBuilderWithTypes(builder, types);
