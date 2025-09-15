@@ -2,18 +2,18 @@
 
 namespace Bipolar
 {
-    public class InterfaceButtonAttribute : PropertyAttribute
+    public class NewObjectButtonAttribute : PropertyAttribute
     {
-        public InterfaceButtonType ButtonType { get; private set; }
+        public ObjectCreationType ButtonType { get; private set; }
 
-        public InterfaceButtonAttribute(InterfaceButtonType buttonType)
+        public NewObjectButtonAttribute(ObjectCreationType buttonType)
         {
             ButtonType = buttonType;
         }
     }
 
     [System.Flags]
-    public enum InterfaceButtonType
+    public enum ObjectCreationType
     {
         None = 0,
         AddComponent = 1 << 0,

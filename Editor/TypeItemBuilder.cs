@@ -6,7 +6,7 @@ namespace Bipolar.Editor
 {
     internal class TypeItemBuilder
     {
-        internal class Node
+        private class Node
         {
             public string Name { get; set; }
 

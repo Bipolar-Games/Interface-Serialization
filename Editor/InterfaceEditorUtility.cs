@@ -36,9 +36,9 @@ namespace Bipolar.Editor
 			return null;
 		}
 
-        public static InterfaceButtonType GetButtons(FieldInfo fieldInfo, InterfaceButtonType @default = InterfaceButtonType.None)
+        public static ObjectCreationType GetButtons(FieldInfo fieldInfo, ObjectCreationType @default = ObjectCreationType.None)
         {
-            var buttonsAttribute = fieldInfo.GetCustomAttribute<InterfaceButtonAttribute>();
+            var buttonsAttribute = fieldInfo.GetCustomAttribute<NewObjectButtonAttribute>();
 
             var buttons = buttonsAttribute?.ButtonType ?? @default;
             return buttons;
