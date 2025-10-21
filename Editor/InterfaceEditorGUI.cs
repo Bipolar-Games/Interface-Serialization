@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
-using UnityEditor.Experimental;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 using Styles = Bipolar.Editor.InterfaceEditorStyles;
@@ -358,6 +356,5 @@ namespace Bipolar.Editor
             dropdownRect.center = fieldRect.center;
             return dropdownRect;
         }
-
     }
 }
