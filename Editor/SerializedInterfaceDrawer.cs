@@ -1,15 +1,23 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Bipolar.Editor
 {
-    [CustomPropertyDrawer(typeof(Serialized<>), true)]
+	[CustomPropertyDrawer(typeof(Serialized<>), true)]
     [CustomPropertyDrawer(typeof(Serialized<,>), true)]
     public class SerializedInterfaceDrawer : PropertyDrawer
     {
         private const string serializedObjectPropertyName = "serializedObject";
+        
+		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		{
+            var container = new VisualElement();
+            container.Add(new Label("Serialized Interface Property"));
+            return container;
+		}
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
 
