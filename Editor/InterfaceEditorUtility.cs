@@ -50,7 +50,7 @@ namespace Bipolar.Editor
             if (attribute != null)
             {
                 string fileName = attribute.fileName;
-                if (fileName != null)
+                if (string.IsNullOrWhiteSpace(fileName) == false)
                     return fileName;
             }
 
