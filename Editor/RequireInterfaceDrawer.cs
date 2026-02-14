@@ -33,7 +33,8 @@ namespace Bipolar.Editor
 				container.style.flexDirection = FlexDirection.Row;
 
 				var requiredAttribute = attribute as RequireInterfaceAttribute;
-				UIToolkitHelper.DrawProperty(property, container, requiredAttribute.RequiredType);
+				var requiredType = requiredAttribute.RequiredType;
+				UIToolkitHelper.DrawProperty(property, container, requiredType);
 
 				var buttons = requiredAttribute.ButtonType;
 				buttons = InterfaceEditorUtility.GetButtons(fieldInfo, buttons);
@@ -48,7 +49,7 @@ namespace Bipolar.Editor
 
 					if (hasAddComponentButton)
 					{
-						var addComponentButton = new Button()
+						var addComponentButton = new Button(ShowAddComponentDropDown)
 						{
 							text = "Add",
 							style =
@@ -59,11 +60,17 @@ namespace Bipolar.Editor
 							}
 						};
 						container.Add(addComponentButton);
+
+						void ShowAddComponentDropDown()
+						{
+							var dropdownRect = InterfaceEditorUtility.GetDropdownRect(container.worldBound);
+							InterfaceEditorUtility.ShowAddComponentDropDown(requiredType, property, dropdownRect);
+						}
 					}
 
 					if (hasCreateAssetButton)
 					{
-						var createAssetButton = new Button()
+						var createAssetButton = new Button(ShowCreateAssetDropdown)
 						{
 							text = "Create",
 							style =
@@ -74,6 +81,13 @@ namespace Bipolar.Editor
 							}
 						};
 						container.Add(createAssetButton);
+
+						void ShowCreateAssetDropdown()
+						{
+							var dropdownRect = InterfaceEditorUtility.GetDropdownRect(container.worldBound);
+							InterfaceEditorUtility.ShowCreateAssetDropdown(requiredType, property, dropdownRect);
+						}
+
 					}
 				}
 

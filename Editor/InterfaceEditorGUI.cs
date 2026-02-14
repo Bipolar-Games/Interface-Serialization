@@ -279,25 +279,10 @@ namespace Bipolar.Editor
             var rect = DrawSideButton(buttonPosition, "Add", style, AddComponentButtonWidth, requiredType, ShowDropDown);
             return rect;
 
-            void ShowDropDown()
+			void ShowDropDown()
             {
-                var dropdown = new AddComponentDropdown(requiredType);
-                dropdown.OnItemSelected += item =>
-                {
-                    var gameObjects = serializedObjectProperty.serializedObject.targetObjects
-                        .Where(obj => obj is Component)
-                        .Select(c => ((Component)c).gameObject);
-
-                    foreach (var gameObject in gameObjects)
-                    {
-                        var addedComponent = ObjectFactory.AddComponent(gameObject, item.Type);
-                        serializedObjectProperty.objectReferenceValue = addedComponent;
-                        serializedObjectProperty.serializedObject.ApplyModifiedProperties();
-                    }
-                };
-
-                Rect dropDownRect = GetDropdownRect(propertyRect);
-                dropdown.Show(dropDownRect);
+				Rect dropDownRect = InterfaceEditorUtility.GetDropdownRect(propertyRect);
+				InterfaceEditorUtility.ShowAddComponentDropDown(requiredType, serializedObjectProperty, dropDownRect);
             }
         }
 
@@ -308,31 +293,8 @@ namespace Bipolar.Editor
 
             void ShowDropDown()
             {
-                var dropdown = new CreateAssetDropdown(requiredType);
-                dropdown.OnItemSelected += item =>
-                {
-                    var createdAsset = ObjectFactory.CreateInstance(item.Type);
-
-                    string folderPath = "Assets";
-                    var selectedAssets = Selection.GetFiltered<Object>(SelectionMode.Assets);
-                    if (selectedAssets.Length > 0)
-                    {
-                        folderPath = AssetDatabase.GetAssetPath(selectedAssets[0]);
-                        if (AssetDatabase.IsValidFolder(folderPath) == false)
-                            folderPath = Path.GetDirectoryName(folderPath);
-                    }
-
-                    var preferedAssetName = InterfaceEditorUtility.GetAssetFileName(item.Type);
-                    var assetPath = AssetDatabase.GenerateUniqueAssetPath($"{folderPath}/{preferedAssetName}.asset");
-                    AssetDatabase.CreateAsset(createdAsset, assetPath);
-                    AssetDatabase.SaveAssets();
-                    EditorGUIUtility.PingObject(createdAsset);
-                    serializedObjectProperty.objectReferenceValue = createdAsset;
-                    serializedObjectProperty.serializedObject.ApplyModifiedProperties();
-                };
-
-                Rect dropDownRect = GetDropdownRect(propertyRect);
-                dropdown.Show(dropDownRect);
+				Rect dropDownRect = InterfaceEditorUtility.GetDropdownRect(propertyRect);
+				InterfaceEditorUtility.ShowCreateAssetDropdown(requiredType, serializedObjectProperty, dropDownRect);
             }
         }
 
@@ -347,13 +309,5 @@ namespace Bipolar.Editor
             return position;
         }
 
-        public static Rect GetDropdownRect(Rect fieldRect)
-        {
-            var dropdownRect = new Rect();
-            dropdownRect.width = Mathf.Max(Screen.width / 2f, 230);
-            dropdownRect.height = fieldRect.height;
-            dropdownRect.center = fieldRect.center;
-            return dropdownRect;
-        }
     }
 }

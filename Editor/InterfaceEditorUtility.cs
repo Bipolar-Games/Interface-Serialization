@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -56,5 +58,66 @@ namespace Bipolar.Editor
 
             return "New " + ObjectNames.NicifyVariableName(type.Name);
         }
-    }
+
+
+		internal static AddComponentDropdown ShowAddComponentDropDown(System.Type type, SerializedProperty objectProperty, Rect dropdownRect)
+		{
+			var dropdown = new AddComponentDropdown(type);
+			dropdown.OnItemSelected += item =>
+			{
+				var gameObjects = objectProperty.serializedObject.targetObjects
+					.Where(obj => obj is Component)
+					.Select(c => ((Component)c).gameObject);
+
+				foreach (var gameObject in gameObjects)
+				{
+					var addedComponent = ObjectFactory.AddComponent(gameObject, item.Type);
+					objectProperty.objectReferenceValue = addedComponent;
+					objectProperty.serializedObject.ApplyModifiedProperties();
+				}
+			};
+
+			dropdown.Show(dropdownRect);
+			return dropdown;
+		}
+
+
+		internal static CreateAssetDropdown ShowCreateAssetDropdown(System.Type type, SerializedProperty objectProperty, Rect dropdownRect)
+		{
+			var dropdown = new CreateAssetDropdown(type);
+			dropdown.OnItemSelected += item =>
+			{
+				var createdAsset = ObjectFactory.CreateInstance(item.Type);
+
+				string folderPath = "Assets";
+				var selectedAssets = Selection.GetFiltered<Object>(SelectionMode.Assets);
+				if (selectedAssets.Length > 0)
+				{
+					folderPath = AssetDatabase.GetAssetPath(selectedAssets[0]);
+					if (AssetDatabase.IsValidFolder(folderPath) == false)
+						folderPath = Path.GetDirectoryName(folderPath);
+				}
+
+				var preferedAssetName = GetAssetFileName(item.Type);
+				var assetPath = AssetDatabase.GenerateUniqueAssetPath($"{folderPath}/{preferedAssetName}.asset");
+				AssetDatabase.CreateAsset(createdAsset, assetPath);
+				AssetDatabase.SaveAssets();
+				EditorGUIUtility.PingObject(createdAsset);
+				objectProperty.objectReferenceValue = createdAsset;
+				objectProperty.serializedObject.ApplyModifiedProperties();
+			};
+
+			dropdown.Show(dropdownRect);
+			return dropdown;
+		}
+
+        public static Rect GetDropdownRect(Rect fieldRect)
+        {
+            var dropdownRect = new Rect();
+            dropdownRect.width = Mathf.Max(Screen.width / 2f, 230);
+            dropdownRect.height = fieldRect.height;
+            dropdownRect.center = fieldRect.center;
+            return dropdownRect;
+        }
+	}
 }
