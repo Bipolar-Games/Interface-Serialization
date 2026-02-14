@@ -31,11 +31,17 @@ namespace Bipolar.Editor
 
 	public class InterfaceSelectorWindow : EditorWindow
 	{
+		public enum InterfaceSelectorTab
+		{
+			Assets,
+			SceneObjects,
+		}
+
 		private class InterfacePickerWindowData
 		{
 			public System.Type filteredType;
 			public bool isFocused = false;
-			public static int tab;
+			public static InterfaceSelectorTab tab;
 
 			private Object[] assetsOfType;
 			public Object[] AssetsOfType => assetsOfType;
@@ -71,9 +77,6 @@ namespace Bipolar.Editor
 				return _selectedStyle;
 			}
 		}
-
-		private const int AssetsTab = 0;
-		private const int SceneObjectsTab = 1;
 
 		#endregion
 
@@ -158,16 +161,16 @@ namespace Bipolar.Editor
 				data.isFocused = true;
 			}
 
-			int tab = InterfacePickerWindowData.tab;
-			tab = GUILayout.Toolbar(tab, tabs, tabsLayout);
+			var tab = InterfacePickerWindowData.tab;
+			tab = (InterfaceSelectorTab)GUILayout.Toolbar((int)tab, tabs, tabsLayout);
 
 			switch (tab)
 			{
-				case AssetsTab:
+				case InterfaceSelectorTab.Assets:
 					DrawAssetsPanel();
 					break;
 
-				case SceneObjectsTab:
+				case InterfaceSelectorTab.SceneObjects:
 					DrawSceneObjectsPanel();
 					break;
 			}
