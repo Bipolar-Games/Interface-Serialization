@@ -1,6 +1,8 @@
 ﻿using UnityEditor;
 using UnityEngine;
+#if !BIPOLAR_DISABLE_UI_TOOLKIT
 using UnityEngine.UIElements;
+#endif
 
 namespace Bipolar.Editor
 {

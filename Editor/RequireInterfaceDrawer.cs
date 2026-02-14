@@ -1,31 +1,11 @@
 ﻿using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
+#if !BIPOLAR_DISABLE_UI_TOOLKIT
 using UnityEngine.UIElements;
+#endif
 
 namespace Bipolar.Editor
 {
-	public static class UIToolkitHelper
-	{
-		public static void DrawProperty(SerializedProperty property, VisualElement container, System.Type requiredType)
-		{
-			property.serializedObject.Update();
-			var objectField = new ObjectField(property.displayName)
-			{
-				objectType = requiredType,
-			};
-			objectField.BindProperty(property);
-			objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
-			objectField.Q(className: ObjectField.selectorUssClassName).style.display = DisplayStyle.None;
-
-			var objectSelectorButton = new ObjectSelectorButton(objectField, requiredType);
-			objectField.Q(className: ObjectField.inputUssClassName).Add(objectSelectorButton);
-
-			container.Add(objectField);
-		}
-	}
-
-
 	[CustomPropertyDrawer(typeof(RequireInterfaceAttribute))]
 	public class RequireInterfaceDrawer : PropertyDrawer
 	{
@@ -38,10 +18,10 @@ namespace Bipolar.Editor
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
 			var container = new VisualElement();
-			DrawProperty(property, container);
+			DrawProperty();
 			return container;
 
-			void DrawProperty(SerializedProperty property, VisualElement container)
+			void DrawProperty()
 			{
 				if (property.propertyType != SerializedPropertyType.ObjectReference)
 				{
