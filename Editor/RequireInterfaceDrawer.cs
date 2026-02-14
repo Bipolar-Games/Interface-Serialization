@@ -29,8 +29,54 @@ namespace Bipolar.Editor
 					container.style.color = Color.red;
 					return;
 				}
+
+				container.style.flexDirection = FlexDirection.Row;
+
 				var requiredAttribute = attribute as RequireInterfaceAttribute;
 				UIToolkitHelper.DrawProperty(property, container, requiredAttribute.RequiredType);
+
+				var buttons = requiredAttribute.ButtonType;
+				buttons = InterfaceEditorUtility.GetButtons(fieldInfo, buttons);
+				if (buttons != ObjectCreationType.None)
+				{
+					bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
+					bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
+					bool hasBothButtons = hasAddComponentButton && hasCreateAssetButton;
+
+					container.style.alignItems = Align.Stretch;
+					container.style.minWidth = 0;
+
+					if (hasAddComponentButton)
+					{
+						var addComponentButton = new Button()
+						{
+							text = "Add",
+							style =
+							{
+								marginLeft = 2,
+								marginRight = 0,
+								flexShrink = 0.5f,
+							}
+						};
+						container.Add(addComponentButton);
+					}
+
+					if (hasCreateAssetButton)
+					{
+						var createAssetButton = new Button()
+						{
+							text = "Create",
+							style =
+							{
+								marginLeft = 0,
+								marginRight = 0,
+								flexShrink = 0.5f,
+							}
+						};
+						container.Add(createAssetButton);
+					}
+				}
+
 			}
 		}
 #endif

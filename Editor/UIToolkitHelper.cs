@@ -18,10 +18,15 @@ namespace Bipolar.Editor
 			objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
 			objectField.Q(className: ObjectField.selectorUssClassName).style.display = DisplayStyle.None;
 
+			objectField.style.flexGrow = 1;
+			objectField.style.flexShrink = 1;
+			objectField.style.minWidth = 0;
+
 			var objectSelectorButton = new ObjectSelectorButton(objectField, requiredType);
 			objectField.Q(className: ObjectField.inputUssClassName).Add(objectSelectorButton);
 
 			container.Add(objectField);
+
 		}
 	}
 }
