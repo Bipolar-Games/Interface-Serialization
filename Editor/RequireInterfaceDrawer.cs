@@ -37,6 +37,7 @@ namespace Bipolar.Editor
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
+			var originalPosition = position;
 			if (property.propertyType == SerializedPropertyType.ObjectReference)
 			{
 				EditorGUI.BeginProperty(position, label, property);
@@ -53,13 +54,13 @@ namespace Bipolar.Editor
 				if (hasCreateAssetButton)
 				{
 					var buttonStyle = hasBothButtons ? EditorStyles.miniButtonRight : EditorStyles.miniButton;
-					position = InterfaceEditorGUI.DrawCreateAssetButton(position, property, buttonStyle, requiredType);
+					position = InterfaceEditorGUI.DrawCreateAssetButton(position, property, buttonStyle, requiredType, originalPosition);
 				}
 
 				if (hasAddComponentButton)
 				{
 					var buttonStyle = hasBothButtons ? EditorStyles.miniButtonLeft : EditorStyles.miniButton;
-					position = InterfaceEditorGUI.DrawAddComponentButton(position, property, buttonStyle, requiredType);
+					position = InterfaceEditorGUI.DrawAddComponentButton(position, property, buttonStyle, requiredType, originalPosition);
 				}
 
 				InterfaceEditorGUI.InterfaceField(position, label, property, requiredType);
