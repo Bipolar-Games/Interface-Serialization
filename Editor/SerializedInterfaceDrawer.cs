@@ -21,16 +21,17 @@ namespace Bipolar.Editor
             bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
             bool hasBothButtons = hasCreateAssetButton && hasAddComponentButton;
 
+            var originalRect = position;
             if (hasCreateAssetButton)
             {
                 var buttonStyle = hasBothButtons ? EditorStyles.miniButtonRight : EditorStyles.miniButton;
-                position = InterfaceEditorGUI.DrawCreateAssetButton(position, serializedObjectProperty, buttonStyle, requiredType);
+                position = InterfaceEditorGUI.DrawCreateAssetButton(position, serializedObjectProperty, buttonStyle, requiredType, originalRect);
             }
 
             if (hasAddComponentButton)
             {
                 var buttonStyle = hasBothButtons ? EditorStyles.miniButtonLeft : EditorStyles.miniButton;
-                position = InterfaceEditorGUI.DrawAddComponentButton(position, serializedObjectProperty, buttonStyle, requiredType);
+                position = InterfaceEditorGUI.DrawAddComponentButton(position, serializedObjectProperty, buttonStyle, requiredType, originalRect);
             }
 
             InterfaceEditorGUI.InterfaceField(position, label, serializedObjectProperty, requiredType);

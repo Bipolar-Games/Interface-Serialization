@@ -274,9 +274,9 @@ namespace Bipolar.Editor
             public readonly void Dispose() => EditorGUIUtility.SetIconSize(originalIconSize);
         }
 
-        public static Rect DrawAddComponentButton(Rect position, SerializedProperty serializedObjectProperty, GUIStyle style, System.Type requiredType)
+        public static Rect DrawAddComponentButton(Rect buttonPosition, SerializedProperty serializedObjectProperty, GUIStyle style, System.Type requiredType, Rect propertyRect)
         {
-            var rect = DrawSideButton(position, "Add", style, AddComponentButtonWidth, requiredType, ShowDropDown);
+            var rect = DrawSideButton(buttonPosition, "Add", style, AddComponentButtonWidth, requiredType, ShowDropDown);
             return rect;
 
             void ShowDropDown()
@@ -296,14 +296,14 @@ namespace Bipolar.Editor
                     }
                 };
 
-                Rect dropDownRect = GetDropdownRect(position);
+                Rect dropDownRect = GetDropdownRect(propertyRect);
                 dropdown.Show(dropDownRect);
             }
         }
 
-        public static Rect DrawCreateAssetButton(Rect position, SerializedProperty serializedObjectProperty, GUIStyle style, System.Type requiredType)
+        public static Rect DrawCreateAssetButton(Rect buttonPosition, SerializedProperty serializedObjectProperty, GUIStyle style, System.Type requiredType, Rect propertyRect)
         {
-            var rect = DrawSideButton(position, "Create", style, CreateAssetButtonWidth, requiredType, ShowDropDown);
+            var rect = DrawSideButton(buttonPosition, "Create", style, CreateAssetButtonWidth, requiredType, ShowDropDown);
             return rect;
 
             void ShowDropDown()
@@ -318,7 +318,7 @@ namespace Bipolar.Editor
                     if (selectedAssets.Length > 0)
                     {
                         folderPath = AssetDatabase.GetAssetPath(selectedAssets[0]);
-                        if (!AssetDatabase.IsValidFolder(folderPath))
+                        if (AssetDatabase.IsValidFolder(folderPath) == false)
                             folderPath = Path.GetDirectoryName(folderPath);
                     }
 
@@ -331,7 +331,7 @@ namespace Bipolar.Editor
                     serializedObjectProperty.serializedObject.ApplyModifiedProperties();
                 };
 
-                Rect dropDownRect = GetDropdownRect(position);
+                Rect dropDownRect = GetDropdownRect(propertyRect);
                 dropdown.Show(dropDownRect);
             }
         }
@@ -350,7 +350,7 @@ namespace Bipolar.Editor
         public static Rect GetDropdownRect(Rect fieldRect)
         {
             var dropdownRect = new Rect();
-            dropdownRect.width = Screen.width / 2f;
+            dropdownRect.width = Mathf.Max(Screen.width / 2f, 230);
             dropdownRect.height = fieldRect.height;
             dropdownRect.center = fieldRect.center;
             return dropdownRect;
