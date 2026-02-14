@@ -13,8 +13,12 @@ namespace Bipolar.Editor
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
             var container = new VisualElement();
-            container.Add(new Label("Serialized Interface Property"));
-            return container;
+
+			var serializedObjectProperty = property.FindPropertyRelative(serializedObjectPropertyName);
+			var requiredType = InterfaceEditorUtility.GetRequiredType(fieldInfo);
+			UIToolkitHelper.DrawProperty(serializedObjectProperty, container, requiredType);
+
+			return container;
 		}
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

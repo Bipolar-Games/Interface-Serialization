@@ -5,33 +5,26 @@ using UnityEngine.UIElements;
 
 namespace Bipolar.Editor
 {
-	public class ObjectSelectorButton : VisualElement
+	public static class UIToolkitHelper
 	{
-		private BaseField<Object> objectField;
-		private System.Type requiredType;
-
-		public ObjectSelectorButton(BaseField<Object> objectField, System.Type requiredType)
+		public static void DrawProperty(SerializedProperty property, VisualElement container, System.Type requiredType)
 		{
-			this.objectField = objectField;
-			this.requiredType = requiredType;
-			AddToClassList(ObjectField.selectorUssClassName);
-		}
-
-		[EventInterest(new System.Type[] { typeof(MouseDownEvent) })]
-		protected override void ExecuteDefaultAction(EventBase evt)
-		{
-			base.ExecuteDefaultAction(evt);
-			if (evt is MouseDownEvent mouseDownEvent && mouseDownEvent.button == 0)
+			property.serializedObject.Update();
+			var objectField = new ObjectField(property.displayName)
 			{
-				InterfaceSelectorWindow.Show(requiredType, objectField.value, AssignValue);
-			}
-		}
+				objectType = requiredType,
+			};
+			objectField.BindProperty(property);
+			objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
+			objectField.Q(className: ObjectField.selectorUssClassName).style.display = DisplayStyle.None;
 
-		private void AssignValue(Object selected)
-		{
-			objectField.value = selected;
+			var objectSelectorButton = new ObjectSelectorButton(objectField, requiredType);
+			objectField.Q(className: ObjectField.inputUssClassName).Add(objectSelectorButton);
+
+			container.Add(objectField);
 		}
 	}
+
 
 	[CustomPropertyDrawer(typeof(RequireInterfaceAttribute))]
 	public class RequireInterfaceDrawer : PropertyDrawer
@@ -48,32 +41,16 @@ namespace Bipolar.Editor
 
 			void DrawProperty(SerializedProperty property, VisualElement container)
 			{
-				property.serializedObject.Update();
 				if (property.propertyType != SerializedPropertyType.ObjectReference)
 				{
 					container.Add(errorLabel);
 					container.style.color = Color.red;
 					return;
 				}
-
 				var requiredAttribute = attribute as RequireInterfaceAttribute;
-				var requiredType = requiredAttribute.RequiredType;
-
-				var objectField = new ObjectField(property.displayName)
-				{
-					objectType = requiredType,
-				};
-				objectField.BindProperty(property);
-				objectField.AddToClassList(ObjectField.alignedFieldUssClassName);
-				objectField.Q(className: ObjectField.selectorUssClassName).style.display = DisplayStyle.None;
-
-				var objectSelectorButton = new ObjectSelectorButton(objectField, requiredType);
-				objectField.Q(className: ObjectField.inputUssClassName).Add(objectSelectorButton);
-
-				container.Add(objectField);
+				UIToolkitHelper.DrawProperty(property, container, requiredAttribute.RequiredType);
 			}
 		}
-
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
