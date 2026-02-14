@@ -9,7 +9,8 @@ namespace Bipolar.Editor
     public class SerializedInterfaceDrawer : PropertyDrawer
     {
         private const string serializedObjectPropertyName = "serializedObject";
-        
+#if !BIPOLAR_DISABLE_UI_TOOLKIT
+
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
             var container = new VisualElement();
@@ -20,8 +21,8 @@ namespace Bipolar.Editor
 
 			return container;
 		}
-
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+#endif
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
 

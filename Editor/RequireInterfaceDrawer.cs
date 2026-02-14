@@ -30,8 +30,10 @@ namespace Bipolar.Editor
 	public class RequireInterfaceDrawer : PropertyDrawer
 	{
 		private const string errorMessageText = "Property is not a reference type";
-		private static readonly Label errorLabel = new Label(errorMessageText);
 		private static readonly GUIContent errorMessage = new GUIContent(errorMessageText);
+
+#if !BIPOLAR_DISABLE_UI_TOOLKIT
+		private static readonly Label errorLabel = new Label(errorMessageText);
 
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
@@ -51,6 +53,7 @@ namespace Bipolar.Editor
 				UIToolkitHelper.DrawProperty(property, container, requiredAttribute.RequiredType);
 			}
 		}
+#endif
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
