@@ -16,65 +16,12 @@ namespace Bipolar.Editor
 		public override VisualElement CreatePropertyGUI(SerializedProperty property)
 		{
 			var container = new VisualElement();
-			container.style.flexDirection = FlexDirection.Row;
 
 			var serializedObjectProperty = property.FindPropertyRelative(serializedObjectPropertyName);
 			var requiredType = InterfaceEditorUtility.GetRequiredType(fieldInfo);
-
-			UIToolkitHelper.DrawProperty(serializedObjectProperty, container, requiredType, property.displayName);
-
 			var buttons = InterfaceEditorUtility.GetButtons(fieldInfo);
-			if (buttons != ObjectCreationType.None)
-			{
-				bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
-				bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
-				bool hasBothButtons = hasAddComponentButton && hasCreateAssetButton;
 
-				container.style.alignItems = Align.Stretch;
-				container.style.minWidth = 0;
-				if (hasAddComponentButton)
-				{
-					var addComponentButton = new Button(ShowAddComponentDropDown)
-					{
-						text = "Add",
-						style =
-						{
-							marginLeft = 2,
-							marginRight = 0,
-							flexShrink = 0.5f,
-						}
-					};
-					container.Add(addComponentButton);
-
-					void ShowAddComponentDropDown()
-					{
-						var dropdownRect = InterfaceEditorUtility.GetDropdownRect(container.worldBound);
-						InterfaceEditorUtility.ShowAddComponentDropDown(requiredType, serializedObjectProperty, dropdownRect);
-					}
-				}
-
-				if (hasCreateAssetButton)
-				{
-					var createAssetButton = new Button(ShowCreateAssetDropdown)
-					{
-						text = "Create",
-						style =
-						{
-							marginLeft = 0,
-							marginRight = 0,
-							flexShrink = 0.5f,
-						}
-					};
-					container.Add(createAssetButton);
-
-					void ShowCreateAssetDropdown()
-					{
-						var dropdownRect = InterfaceEditorUtility.GetDropdownRect(container.worldBound);
-						InterfaceEditorUtility.ShowCreateAssetDropdown(requiredType, serializedObjectProperty, dropdownRect);
-					}
-
-				}
-			}
+			UIToolkitHelper.DrawProperty(serializedObjectProperty, container, requiredType, property.displayName, buttons);
 
 			return container;
 		}

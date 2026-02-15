@@ -30,66 +30,11 @@ namespace Bipolar.Editor
 					return;
 				}
 
-				container.style.flexDirection = FlexDirection.Row;
-
 				var requiredAttribute = attribute as RequireInterfaceAttribute;
 				var requiredType = requiredAttribute.RequiredType;
-				UIToolkitHelper.DrawProperty(property, container, requiredType, property.displayName);
-
 				var buttons = InterfaceEditorUtility.GetButtons(fieldInfo, requiredAttribute.ButtonType);
-				if (buttons != ObjectCreationType.None)
-				{
-					bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
-					bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
-					bool hasBothButtons = hasAddComponentButton && hasCreateAssetButton;
 
-					container.style.alignItems = Align.Stretch;
-					container.style.minWidth = 0;
-
-					if (hasAddComponentButton)
-					{
-						var addComponentButton = new Button(ShowAddComponentDropDown)
-						{
-							text = "Add",
-							style =
-							{
-								marginLeft = 2,
-								marginRight = 0,
-								flexShrink = 0.5f,
-							}
-						};
-						container.Add(addComponentButton);
-
-						void ShowAddComponentDropDown()
-						{
-							var dropdownRect = InterfaceEditorUtility.GetDropdownRect(container.worldBound);
-							InterfaceEditorUtility.ShowAddComponentDropDown(requiredType, property, dropdownRect);
-						}
-					}
-
-					if (hasCreateAssetButton)
-					{
-						var createAssetButton = new Button(ShowCreateAssetDropdown)
-						{
-							text = "Create",
-							style =
-							{
-								marginLeft = 0,
-								marginRight = 0,
-								flexShrink = 0.5f,
-							}
-						};
-						container.Add(createAssetButton);
-
-						void ShowCreateAssetDropdown()
-						{
-							var dropdownRect = InterfaceEditorUtility.GetDropdownRect(container.worldBound);
-							InterfaceEditorUtility.ShowCreateAssetDropdown(requiredType, property, dropdownRect);
-						}
-
-					}
-				}
-
+				UIToolkitHelper.DrawProperty(property, container, requiredType, property.displayName, buttons);
 			}
 		}
 #endif
