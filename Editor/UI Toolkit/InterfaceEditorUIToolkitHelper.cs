@@ -27,9 +27,10 @@ namespace Bipolar.Editor
 
 				container.style.alignItems = Align.Stretch;
 				container.style.minWidth = 0;
+
 				if (hasAddComponentButton)
 				{
-					var addComponentButton = new ObjectCreationButton("Add", ShowAddComponentDropDown);
+					var addComponentButton = new ObjectCreationButton(InterfaceEditorUtility.AddComponentButtonText, ShowAddComponentDropDown);
 					
 					if (hasBothButtons)
 					{
@@ -48,10 +49,11 @@ namespace Bipolar.Editor
 
 				if (hasCreateAssetButton)
 				{
-					var createAssetButton = new ObjectCreationButton("Create", ShowCreateAssetDropdown);
+					var createAssetButton = new ObjectCreationButton(InterfaceEditorUtility.CreateAssetButtonText, ShowCreateAssetDropdown);
 
 					if (hasBothButtons)
 					{
+						createAssetButton.style.marginLeft = -1;
 						createAssetButton.style.borderBottomLeftRadius = 0;
 						createAssetButton.style.borderTopLeftRadius = 0;
 					}
@@ -65,7 +67,6 @@ namespace Bipolar.Editor
 					}
 				}
 			}
-
 		}
 	}
 }

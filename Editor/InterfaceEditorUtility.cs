@@ -9,7 +9,10 @@ namespace Bipolar.Editor
 {
 	public static class InterfaceEditorUtility
 	{
-        public static System.Type GetRequiredType(FieldInfo fieldInfo)
+		public const string AddComponentButtonText = "Add";
+		public const string CreateAssetButtonText = "Create";
+
+		public static System.Type GetRequiredType(FieldInfo fieldInfo)
 		{
 			var type = fieldInfo.FieldType;
 			while (type != null)

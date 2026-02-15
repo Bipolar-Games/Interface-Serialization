@@ -8,6 +8,8 @@ namespace Bipolar.Editor
 		public ObjectCreationButton(string text, System.Action onClick) : base(onClick)
 		{
 			this.text = text;
+
+			focusable = false;
 			style.flexShrink = 0.5f;
 			style.marginLeft = 0;
 			style.marginRight = 0;

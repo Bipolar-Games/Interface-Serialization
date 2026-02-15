@@ -304,7 +304,7 @@ namespace Bipolar.Editor
 
         public static Rect DrawAddComponentButton(Rect buttonPosition, SerializedProperty serializedObjectProperty, GUIStyle style, System.Type requiredType, Rect propertyRect)
         {
-            var rect = DrawSideButton(buttonPosition, "Add", style, AddComponentButtonWidth, requiredType, ShowDropDown);
+            var rect = DrawSideButton(buttonPosition, InterfaceEditorUtility.AddComponentButtonText, style, AddComponentButtonWidth, requiredType, ShowDropDown);
             return rect;
 
 			void ShowDropDown()
@@ -316,7 +316,7 @@ namespace Bipolar.Editor
 
         public static Rect DrawCreateAssetButton(Rect buttonPosition, SerializedProperty serializedObjectProperty, GUIStyle style, System.Type requiredType, Rect propertyRect)
         {
-            var rect = DrawSideButton(buttonPosition, "Create", style, CreateAssetButtonWidth, requiredType, ShowDropDown);
+            var rect = DrawSideButton(buttonPosition, InterfaceEditorUtility.CreateAssetButtonText, style, CreateAssetButtonWidth, requiredType, ShowDropDown);
             return rect;
 
             void ShowDropDown()
