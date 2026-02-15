@@ -11,43 +11,24 @@ namespace Bipolar.Editor
 
 		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			var originalPosition = position;
-			if (property.propertyType == SerializedPropertyType.ObjectReference)
-			{
-				EditorGUI.BeginProperty(position, label, property);
-
-				var requiredAttribute = attribute as RequireInterfaceAttribute;
-				var requiredType = requiredAttribute.RequiredType;
-
-				var buttons = requiredAttribute.ButtonType;
-				buttons = InterfaceEditorUtility.GetButtons(fieldInfo, buttons);
-				bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
-				bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
-				bool hasBothButtons = hasCreateAssetButton && hasAddComponentButton;
-
-				if (hasCreateAssetButton)
-				{
-					var buttonStyle = hasBothButtons ? EditorStyles.miniButtonRight : EditorStyles.miniButton;
-					position = InterfaceEditorGUI.DrawCreateAssetButton(position, property, buttonStyle, requiredType, originalPosition);
-				}
-
-				if (hasAddComponentButton)
-				{
-					var buttonStyle = hasBothButtons ? EditorStyles.miniButtonLeft : EditorStyles.miniButton;
-					position = InterfaceEditorGUI.DrawAddComponentButton(position, property, buttonStyle, requiredType, originalPosition);
-				}
-
-				InterfaceEditorGUI.InterfaceField(position, label, property, requiredType);
-
-				EditorGUI.EndProperty();
-			}
-			else
+			if (property.propertyType != SerializedPropertyType.ObjectReference)
 			{
 				var previousColor = GUI.color;
 				GUI.color = Color.red;
 				EditorGUI.LabelField(position, label, errorMessage);
 				GUI.color = previousColor;
+				return;
 			}
+
+			EditorGUI.BeginProperty(position, label, property);
+
+			var requiredAttribute = attribute as RequireInterfaceAttribute;
+			var requiredType = requiredAttribute.RequiredType;
+			var buttons = InterfaceEditorUtility.GetButtons(fieldInfo, requiredAttribute.ButtonType);
+
+			InterfaceEditorGUI.DrawInterfaceProperty(position, property, label, requiredType, buttons);
+
+			EditorGUI.EndProperty();
 		}
 	}
 }

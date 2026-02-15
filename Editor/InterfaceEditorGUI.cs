@@ -16,9 +16,19 @@ namespace Bipolar.Editor
 
         private static readonly int objectFieldHash = "s_ObjectFieldHash".GetHashCode();
 
-        public static Object InterfaceField(Rect position, GUIContent label, Object @object, System.Type interfaceType, bool allowSceneObjects = true) => DoInterfaceField(position, label, null, @object, interfaceType, allowSceneObjects);
+        public static void DrawInterfaceProperty(Rect position, SerializedProperty serializedObjectProperty, GUIContent label, System.Type interfaceType, ObjectCreationType buttons)
+		{
+			if (buttons != ObjectCreationType.None)
+				DrawObjectCreationButtons(ref position, buttons, serializedObjectProperty, interfaceType);
 
-        public static void InterfaceField(Rect position, GUIContent label, SerializedProperty serializedObjectProperty, System.Type interfaceType, bool allowSceneObjects = true) => DoInterfaceField(position, label, serializedObjectProperty, null, interfaceType, allowSceneObjects);
+			InterfaceField(position, label, serializedObjectProperty, interfaceType);
+		}
+
+		public static Object InterfaceField(Rect position, GUIContent label, Object @object, System.Type interfaceType, bool allowSceneObjects = true) =>
+            DoInterfaceField(position, label, null, @object, interfaceType, allowSceneObjects);
+
+        public static void InterfaceField(Rect position, GUIContent label, SerializedProperty serializedObjectProperty, System.Type interfaceType, bool allowSceneObjects = true) =>
+            DoInterfaceField(position, label, serializedObjectProperty, null, interfaceType, allowSceneObjects);
 
         private static Object DoInterfaceField(Rect position, GUIContent label, SerializedProperty serializedObjectProperty, Object @object, System.Type interfaceType, bool allowSceneObjects)
         {
@@ -273,6 +283,26 @@ namespace Bipolar.Editor
 
             public readonly void Dispose() => EditorGUIUtility.SetIconSize(originalIconSize);
         }
+
+        public static void DrawObjectCreationButtons(ref Rect position, ObjectCreationType buttons, SerializedProperty serializedObjectProperty, System.Type requiredType)
+        {
+			bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
+			bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
+			bool hasBothButtons = hasCreateAssetButton && hasAddComponentButton;
+
+			var originalRect = position;
+			if (hasCreateAssetButton)
+			{
+				var buttonStyle = hasBothButtons ? EditorStyles.miniButtonRight : EditorStyles.miniButton;
+				position = DrawCreateAssetButton(position, serializedObjectProperty, buttonStyle, requiredType, originalRect);
+			}
+
+			if (hasAddComponentButton)
+			{
+				var buttonStyle = hasBothButtons ? EditorStyles.miniButtonLeft : EditorStyles.miniButton;
+				position = DrawAddComponentButton(position, serializedObjectProperty, buttonStyle, requiredType, originalRect);
+			}
+		}
 
         public static Rect DrawAddComponentButton(Rect buttonPosition, SerializedProperty serializedObjectProperty, GUIStyle style, System.Type requiredType, Rect propertyRect)
         {

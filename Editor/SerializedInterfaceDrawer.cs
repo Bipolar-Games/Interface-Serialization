@@ -15,26 +15,9 @@ namespace Bipolar.Editor
 
             var serializedObjectProperty = property.FindPropertyRelative(serializedObjectPropertyName);
             var requiredType = InterfaceEditorUtility.GetRequiredType(fieldInfo);
-
             var buttons = InterfaceEditorUtility.GetButtons(fieldInfo);
-            bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
-            bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
-            bool hasBothButtons = hasCreateAssetButton && hasAddComponentButton;
-
-            var originalRect = position;
-            if (hasCreateAssetButton)
-            {
-                var buttonStyle = hasBothButtons ? EditorStyles.miniButtonRight : EditorStyles.miniButton;
-                position = InterfaceEditorGUI.DrawCreateAssetButton(position, serializedObjectProperty, buttonStyle, requiredType, originalRect);
-            }
-
-            if (hasAddComponentButton)
-            {
-                var buttonStyle = hasBothButtons ? EditorStyles.miniButtonLeft : EditorStyles.miniButton;
-                position = InterfaceEditorGUI.DrawAddComponentButton(position, serializedObjectProperty, buttonStyle, requiredType, originalRect);
-            }
-
-            InterfaceEditorGUI.InterfaceField(position, label, serializedObjectProperty, requiredType);
+			
+			InterfaceEditorGUI.DrawInterfaceProperty(position, serializedObjectProperty, label, requiredType, buttons);
 
             EditorGUI.EndProperty();
         }
