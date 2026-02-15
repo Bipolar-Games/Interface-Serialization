@@ -59,7 +59,6 @@ namespace Bipolar.Editor
             return "New " + ObjectNames.NicifyVariableName(type.Name);
         }
 
-
 		internal static AddComponentDropdown ShowAddComponentDropDown(System.Type type, SerializedProperty objectProperty, Rect dropdownRect)
 		{
 			var dropdown = new AddComponentDropdown(type);
@@ -80,7 +79,6 @@ namespace Bipolar.Editor
 			dropdown.Show(dropdownRect);
 			return dropdown;
 		}
-
 
 		internal static CreateAssetDropdown ShowCreateAssetDropdown(System.Type type, SerializedProperty objectProperty, Rect dropdownRect)
 		{
