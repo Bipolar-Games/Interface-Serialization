@@ -36,8 +36,7 @@ namespace Bipolar.Editor
 				var requiredType = requiredAttribute.RequiredType;
 				UIToolkitHelper.DrawProperty(property, container, requiredType, property.displayName);
 
-				var buttons = requiredAttribute.ButtonType;
-				buttons = InterfaceEditorUtility.GetButtons(fieldInfo, buttons);
+				var buttons = InterfaceEditorUtility.GetButtons(fieldInfo, requiredAttribute.ButtonType);
 				if (buttons != ObjectCreationType.None)
 				{
 					bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
@@ -105,8 +104,7 @@ namespace Bipolar.Editor
 				var requiredAttribute = attribute as RequireInterfaceAttribute;
 				var requiredType = requiredAttribute.RequiredType;
 
-				var buttons = requiredAttribute.ButtonType;
-				buttons = InterfaceEditorUtility.GetButtons(fieldInfo, buttons);
+				var buttons = InterfaceEditorUtility.GetButtons(fieldInfo, requiredAttribute.ButtonType);
 				bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
 				bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
 				bool hasBothButtons = hasCreateAssetButton && hasAddComponentButton;

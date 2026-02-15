@@ -118,12 +118,12 @@ namespace Bipolar.Editor
 
                 void HandleObjectFieldPress()
                 {
-                    var clickedObject = @object;
+					if (EditorGUI.showMixedValue)
+						return;
+
+					var clickedObject = @object;
                     if (clickedObject is Component component)
                         clickedObject = component.gameObject;
-
-                    if (EditorGUI.showMixedValue)
-                        return;
 
                     switch (currentEvent.clickCount)
                     {
