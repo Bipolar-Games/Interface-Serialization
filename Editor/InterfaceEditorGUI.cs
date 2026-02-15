@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 using Styles = Bipolar.Editor.InterfaceEditorStyles;
