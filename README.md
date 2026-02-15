@@ -153,31 +153,31 @@ You can also find the available objects in custom Object Selector window, which 
 
 
 ### Side Buttons
-To make creation of new objects implementing the interface more streamlined side interface buttons were introduced. They allow to quickly create new objects without having to search through "Assets/Create" and "Add Component" menus, and automatically add object reference to the field.
+To make creation of new objects implementing the interface more streamlined side interface buttons were introduced. They allow to quickly create new objects without having to search through "Assets/Create" and "Add Component" menus, and automatically connect object reference to the field.
 
-#### Interface Button Attribute
-To show side buttons with the interface field you need to apply `InterfaceButton` attribute to the field. The field must either inherit from `Serialized<,>` or have `RequiredInterface` attribute applied. The `InterfaceButton` attribute constructor requires specifying which buttons should be shown with `InterfaceButtonType`. Any combination of following types can be chosen:
-- `AddComponent` - creates a button which adds a Component implementing the interface to the GameObject and assigns it to the interface field
-- `CreateAsset` - creates a button that creates a new instance of ScriptableObject implementing the interface and assigns it to the interface field
+#### New Object Button Attribute
+To show side buttons with the interface field you need to apply `NewObjectButton` attribute to the field. The field must either inherit from `Serialized<,>` or have `RequireInterface` attribute applied. The `NewObjectButton` attribute constructor requires specifying which buttons should be shown with `ObjectCreationTypes` enumeration. Any combination of following types can be chosen:
+- `AddComponent` - shows a button which allows adding a Component implementing the interface to the GameObject and assigns it to the interface field
+- `CreateAsset` - shows a button that allows creating a new instance of ScriptableObject implementing the interface and assigns it to the interface field
 
 
 Chosing multiple types can be achieved by joining them with bitwise OR operator (`|`).
 For using both types of buttons `Both` type can be also used.
  
 ```cs
-    [SerializeField, InterfaceButton(InterfaceButtonType.AddComponent)]
+    [SerializeField, NewObjectButton(ObjectCreationTypes.AddComponent)]
     private Serialized<IMyInterface> mySerializedInterface;
 ```
 
 Alternatively if you are using `RequireInterface` attribute you can specify the buttons in the second argument of the attribute constructor.
 
 ```cs
-    [SerializeField, RequireInterface(typeof(IMyInterface), InterfaceButtonType.CreateAsset)]
+    [SerializeField, RequireInterface(typeof(IMyInterface), ObjectCreationTypes.CreateAsset)]
     private Object mySerializedInterface;
 ```
 
 #### Inspector Usage
-After applying the `InterfaceButton` attribute to the field side buttons will be shown beside the field in the Inspector, as displayed in the picture below.
+After applying the `NewObjectButton` attribute to the field side buttons will be shown beside the field in the Inspector, as displayed in the picture below.
 
 ![image](https://github.com/user-attachments/assets/32f3167e-8fe3-44e1-b165-0550688c1b3d)
 
