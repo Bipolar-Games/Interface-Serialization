@@ -5,7 +5,7 @@ using UnityEditor.UIElements;
 
 namespace Bipolar.Editor
 {
-	public static class UIToolkitHelper
+	public static class InterfaceEditorUIToolkitHelper
 	{
 		public static void DrawProperty(SerializedProperty property, VisualElement container, System.Type requiredType, string label, ObjectCreationType buttons)
 		{
@@ -52,7 +52,6 @@ namespace Bipolar.Editor
 
 					if (hasBothButtons)
 					{
-						createAssetButton.style.marginLeft = -1;
 						createAssetButton.style.borderBottomLeftRadius = 0;
 						createAssetButton.style.borderTopLeftRadius = 0;
 					}
@@ -67,34 +66,6 @@ namespace Bipolar.Editor
 				}
 			}
 
-		}
-	}
-
-	public class InterfaceField : ObjectField
-	{
-		public InterfaceField(string label, System.Type interfaceType) : base(label)
-		{
-			objectType = interfaceType;
-			AddToClassList(alignedFieldUssClassName);
-			this.Q(className: selectorUssClassName).style.display = DisplayStyle.None;
-
-			style.flexGrow = 1;
-			style.flexShrink = 1;
-			style.minWidth = 0;
-
-			var objectSelectorButton = new ObjectSelectorButton(this, interfaceType);
-			this.Q(className: inputUssClassName).Add(objectSelectorButton);
-		}
-	}
-
-	public class ObjectCreationButton : Button
-	{
-		public ObjectCreationButton(string text, System.Action onClick) : base(onClick)
-		{
-			this.text = text;
-			style.flexShrink = 0.5f;
-			style.marginLeft = 0;
-			style.marginRight = 0;
 		}
 	}
 }

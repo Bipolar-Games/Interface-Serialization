@@ -34,7 +34,7 @@ namespace Bipolar.Editor
 				var requiredType = requiredAttribute.RequiredType;
 				var buttons = InterfaceEditorUtility.GetButtons(fieldInfo, requiredAttribute.ButtonType);
 
-				UIToolkitHelper.DrawProperty(property, container, requiredType, property.displayName, buttons);
+				InterfaceEditorUIToolkitHelper.DrawProperty(property, container, requiredType, property.displayName, buttons);
 			}
 		}
 #endif
