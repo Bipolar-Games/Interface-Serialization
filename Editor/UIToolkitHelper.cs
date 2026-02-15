@@ -7,10 +7,10 @@ namespace Bipolar.Editor
 {
 	public static class UIToolkitHelper
 	{
-		public static void DrawProperty(SerializedProperty property, VisualElement container, System.Type requiredType)
+		public static void DrawProperty(SerializedProperty property, VisualElement container, System.Type requiredType, string label)
 		{
 			property.serializedObject.Update();
-			var objectField = new ObjectField(property.displayName)
+			var objectField = new ObjectField(label)
 			{
 				objectType = requiredType,
 			};

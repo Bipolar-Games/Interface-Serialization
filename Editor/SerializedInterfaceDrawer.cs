@@ -19,7 +19,7 @@ namespace Bipolar.Editor
 
 			var serializedObjectProperty = property.FindPropertyRelative(serializedObjectPropertyName);
 			var requiredType = InterfaceEditorUtility.GetRequiredType(fieldInfo);
-			UIToolkitHelper.DrawProperty(serializedObjectProperty, container, requiredType);
+			UIToolkitHelper.DrawProperty(serializedObjectProperty, container, requiredType, property.displayName);
 
 			return container;
 		}
