@@ -14,9 +14,9 @@ namespace Bipolar.Editor
 
         private static readonly int objectFieldHash = "s_ObjectFieldHash".GetHashCode();
 
-        public static void DrawInterfaceProperty(Rect position, SerializedProperty serializedObjectProperty, GUIContent label, System.Type interfaceType, ObjectCreationType buttons)
+        public static void DrawInterfaceProperty(Rect position, SerializedProperty serializedObjectProperty, GUIContent label, System.Type interfaceType, ObjectCreationTypes buttons)
 		{
-			if (buttons != ObjectCreationType.None)
+			if (buttons != ObjectCreationTypes.None)
 				DrawObjectCreationButtons(ref position, buttons, serializedObjectProperty, interfaceType);
 
 			InterfaceField(position, label, serializedObjectProperty, interfaceType);
@@ -282,10 +282,10 @@ namespace Bipolar.Editor
             public readonly void Dispose() => EditorGUIUtility.SetIconSize(originalIconSize);
         }
 
-        public static void DrawObjectCreationButtons(ref Rect position, ObjectCreationType buttons, SerializedProperty serializedObjectProperty, System.Type requiredType)
+        public static void DrawObjectCreationButtons(ref Rect position, ObjectCreationTypes buttons, SerializedProperty serializedObjectProperty, System.Type requiredType)
         {
-			bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
-			bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
+			bool hasAddComponentButton = buttons.HasFlag(ObjectCreationTypes.AddComponent);
+			bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationTypes.CreateAsset);
 			bool hasBothButtons = hasCreateAssetButton && hasAddComponentButton;
 
 			var originalRect = position;

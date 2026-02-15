@@ -4,16 +4,16 @@ namespace Bipolar
 {
     public class NewObjectButtonAttribute : PropertyAttribute
     {
-        public ObjectCreationType ButtonType { get; private set; }
+        public ObjectCreationTypes ButtonType { get; private set; }
 
-        public NewObjectButtonAttribute(ObjectCreationType buttonType)
+        public NewObjectButtonAttribute(ObjectCreationTypes buttonType)
         {
             ButtonType = buttonType;
         }
     }
 
     [System.Flags]
-    public enum ObjectCreationType
+    public enum ObjectCreationTypes
     {
         None = 0,
         AddComponent = 1 << 0,

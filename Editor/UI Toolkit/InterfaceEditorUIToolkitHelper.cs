@@ -7,7 +7,7 @@ namespace Bipolar.Editor
 {
 	public static class InterfaceEditorUIToolkitHelper
 	{
-		public static void DrawProperty(SerializedProperty property, VisualElement container, System.Type requiredType, string label, ObjectCreationType buttons)
+		public static void DrawProperty(SerializedProperty property, VisualElement container, System.Type requiredType, string label, ObjectCreationTypes buttons)
 		{
 			property.serializedObject.Update();
 			container.style.flexDirection = FlexDirection.Row;
@@ -17,12 +17,12 @@ namespace Bipolar.Editor
 			interfaceField.BindProperty(property);
 			container.Add(interfaceField);
 
-			if (buttons != ObjectCreationType.None)
+			if (buttons != ObjectCreationTypes.None)
 			{
 				interfaceField.style.marginRight = 0;
 
-				bool hasAddComponentButton = buttons.HasFlag(ObjectCreationType.AddComponent);
-				bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationType.CreateAsset);
+				bool hasAddComponentButton = buttons.HasFlag(ObjectCreationTypes.AddComponent);
+				bool hasCreateAssetButton = buttons.HasFlag(ObjectCreationTypes.CreateAsset);
 				bool hasBothButtons = hasAddComponentButton && hasCreateAssetButton;
 
 				container.style.alignItems = Align.Stretch;
