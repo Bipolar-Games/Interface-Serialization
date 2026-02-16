@@ -181,7 +181,7 @@ After applying the `NewObjectButton` attribute to the field side buttons will be
 
 ![image](https://github.com/user-attachments/assets/32f3167e-8fe3-44e1-b165-0550688c1b3d)
 
-Upon pressing any of the side buttons objects browser will show up, from which you can choose Component type you want to add or ScriptableObject type you want to create. Pressing the type name will result in addition/creation of the specified object. Types in the browser are also hierarchically grouped according to the `AddComponentMenu` attrbute for Components and `CreateAssetMenu` attribute in case of ScriptableObjects.
+Upon pressing any of the side buttons objects browser will show up, from which you can choose Component type you want to add or ScriptableObject type you want to create. Pressing the type name will result in addition/creation of the specified object. Types in the browser are also hierarchically grouped according to the `AddComponentMenu` attribute for Components and `CreateAssetMenu` attribute in case of ScriptableObjects.
 
 ![2025-05-21 00-53-19](https://github.com/user-attachments/assets/f69af170-2846-42c0-9638-cbd27387269f)
 
