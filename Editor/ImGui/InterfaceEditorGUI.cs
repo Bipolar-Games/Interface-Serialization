@@ -253,17 +253,8 @@ namespace Bipolar.Editor
             if (@event.alt || @event.command || @event.control || @event.shift)
                 return false;
 
-            var key = @event.keyCode;
-            switch (key)
-            {
-                case KeyCode.Return:
-                case KeyCode.Space:
-                case KeyCode.KeypadEnter:
-                    return true;
-                default:
-                    return false;
-            }
-        }
+			return InterfaceEditorUtility.IsConfirmKey(@event.keyCode);
+		}
 
         internal readonly struct IconSizeScope : System.IDisposable
         {

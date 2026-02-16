@@ -6,10 +6,10 @@ namespace Bipolar.Editor
 {
 	public class ObjectSelectorButton : VisualElement
 	{
-		private BaseField<Object> objectField;
+		private InterfaceField objectField;
 		private System.Type requiredType;
 
-		public ObjectSelectorButton(BaseField<Object> objectField, System.Type requiredType)
+		public ObjectSelectorButton(InterfaceField objectField, System.Type requiredType)
 		{
 			this.objectField = objectField;
 			this.requiredType = requiredType;
@@ -22,13 +22,8 @@ namespace Bipolar.Editor
 			base.ExecuteDefaultAction(evt);
 			if (evt is MouseDownEvent mouseDownEvent && mouseDownEvent.button == 0)
 			{
-				InterfaceSelectorWindow.Show(requiredType, objectField.value, AssignValue);
+				InterfaceSelectorWindow.Show(requiredType, objectField.value, objectField.AssignValue);
 			}
-		}
-
-		private void AssignValue(Object selected)
-		{
-			objectField.value = selected;
 		}
 	}
 }
