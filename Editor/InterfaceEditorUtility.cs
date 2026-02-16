@@ -120,5 +120,18 @@ namespace Bipolar.Editor
             dropdownRect.center = fieldRect.center;
             return dropdownRect;
         }
+
+		public static bool IsConfirmKey(KeyCode keyCode)
+		{
+			switch (keyCode)
+			{
+				case KeyCode.Return:
+				case KeyCode.Space:
+				case KeyCode.KeypadEnter:
+					return true;
+				default:
+					return false;
+			}
+		}
 	}
 }
