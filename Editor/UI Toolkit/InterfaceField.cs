@@ -13,6 +13,12 @@ namespace Bipolar.Editor
 			AddToClassList(alignedFieldUssClassName);
 			this.Q(className: selectorUssClassName).style.display = DisplayStyle.None;
 
+
+			var displayElement = this.Q(className: objectUssClassName);
+			displayElement.RegisterCallback<KeyDownEvent>(
+				ExecuteConfirmKeyboardAction,
+				TrickleDown.TrickleDown);
+
 			style.flexGrow = 1;
 			style.flexShrink = 1;
 			style.minWidth = 0;
@@ -21,23 +27,14 @@ namespace Bipolar.Editor
 			this.Q(className: inputUssClassName).Add(objectSelectorButton);
 		}
 
-		[EventInterest(typeof(KeyDownEvent))]
-		protected override void ExecuteDefaultActionAtTarget(EventBase evt)
+		private void ExecuteConfirmKeyboardAction(KeyDownEvent evt)
 		{
-			if (evt == null)
-				return;
-
-			if (TryExecuteConfirmKeyboardAction(evt) == false)
-				base.ExecuteDefaultActionAtTarget(evt);
-		}
-
-		private bool TryExecuteConfirmKeyboardAction(EventBase evt)
-		{
-			if (IsConfirmKeyboardEvent(evt) == false)
-				return false;
-
-			InterfaceSelectorWindow.Show(objectType, value, AssignValue);
-			return true;
+			if (IsConfirmKeyboardEvent(evt))
+			{
+				evt.StopImmediatePropagation();
+				evt.PreventDefault();
+				InterfaceSelectorWindow.Show(objectType, value, AssignValue);
+			}
 		}
 
 		private static bool IsConfirmKeyboardEvent(EventBase evt)
