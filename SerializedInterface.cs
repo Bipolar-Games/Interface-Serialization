@@ -43,6 +43,8 @@ namespace Bipolar
 
         public static implicit operator TInterface(Serialized<TInterface, TSerialized> iface) => iface.Value;
         public static explicit operator Serialized<TInterface, TSerialized>(TInterface iface) => new Serialized<TInterface, TSerialized>() { Value = iface };
+
+        public override string ToString() => Value.ToString();
     }
 
     public static class InterfaceExtensions

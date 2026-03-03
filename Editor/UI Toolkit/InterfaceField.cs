@@ -32,7 +32,6 @@ namespace Bipolar.Editor
 			if (IsConfirmKeyboardEvent(evt))
 			{
 				evt.StopImmediatePropagation();
-				evt.PreventDefault();
 				InterfaceSelectorWindow.Show(objectType, value, AssignValue);
 			}
 		}
