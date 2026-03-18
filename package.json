@@ -1,0 +1,25 @@
+{
+    "name": "com.bipolar.interfaces",
+    "version": "1.4.2",
+    "displayName": "Bipolar Interface Serialization",
+    "description": "Consistent system which enables referencing and serializing UnityEngine.Objects by interface",
+    "unity": "2020.3",
+    "author": {
+        "name": "Kosmik123",
+        "email": "malpa.w.klapkach@gmail.com",
+        "url": "https://github.com/Kosmik123"
+    },
+    "keywords": [
+        "serialization",
+        "interfaces",
+        "inspector",
+        "editor",
+        "editor-tools",
+        "polymorphism",
+        "dependency-injection",
+        "workflow",
+        "tooling"
+    ],
+    "license": "MIT",
+    "documentationUrl": "https://github.com/Bipolar-Games/Interface-Serialization/blob/master/README.md"
+}
