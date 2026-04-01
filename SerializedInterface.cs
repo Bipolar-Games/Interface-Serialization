@@ -9,9 +9,13 @@ namespace Bipolar
     {
         public static explicit operator Serialized<TInterface>(TInterface iface) => new Serialized<TInterface>() { Value = iface };
 
+        public static bool operator ==(Serialized<TInterface> x, Serialized<TInterface> y) => x.Value == y.Value;
+        public static bool operator !=(Serialized<TInterface> x, Serialized<TInterface> y) => x.Value != y.Value;
+
         public static bool operator ==(Serialized<TInterface> x, TInterface y) => x.Value == y;
-        public static bool operator ==(TInterface x, Serialized<TInterface> y) => x == y.Value;
         public static bool operator !=(Serialized<TInterface> x, TInterface y) => x.Value != y;
+        
+        public static bool operator ==(TInterface x, Serialized<TInterface> y) => x == y.Value;
         public static bool operator !=(TInterface x, Serialized<TInterface> y) => x != y.Value;
     }
 
