@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Bipolar
 {
@@ -8,15 +7,6 @@ namespace Bipolar
         where TInterface : class
     {
         public static explicit operator Serialized<TInterface>(TInterface iface) => new Serialized<TInterface>() { Value = iface };
-
-        public static bool operator ==(Serialized<TInterface> x, Serialized<TInterface> y) => x.Value == y.Value;
-        public static bool operator !=(Serialized<TInterface> x, Serialized<TInterface> y) => x.Value != y.Value;
-
-        public static bool operator ==(Serialized<TInterface> x, TInterface y) => x.Value == y;
-        public static bool operator !=(Serialized<TInterface> x, TInterface y) => x.Value != y;
-        
-        public static bool operator ==(TInterface x, Serialized<TInterface> y) => x == y.Value;
-        public static bool operator !=(TInterface x, Serialized<TInterface> y) => x != y.Value;
     }
 
     [System.Serializable]
@@ -55,6 +45,22 @@ namespace Bipolar
         public static explicit operator Serialized<TInterface, TSerialized>(TInterface iface) => new Serialized<TInterface, TSerialized>() { Value = iface };
 
         public override string ToString() => Value.ToString();
+
+        public static bool operator !=(TInterface x, Serialized<TInterface> y) => !(x == y);
+        public static bool operator ==(TInterface x, Serialized<TInterface> y) => y == x;
+        public static bool operator !=(Serialized<TInterface> x, TInterface y) => !(x == y);
+        public static bool operator ==(Serialized<TInterface> x, TInterface y)
+        {
+            if (y is TSerialized obj)
+            {
+                return x.serializedObject == y;
+            }
+            else if (y is Serialized<TSerialized> ySerialized)
+            {
+                return x.serializedObject == ySerialized.serializedObject;
+            }
+            return false;
+        }
     }
 
     public static class InterfaceExtensions
