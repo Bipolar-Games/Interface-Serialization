@@ -46,10 +46,10 @@ namespace Bipolar
 
         public override string ToString() => Value.ToString();
 
-        public static bool operator !=(TInterface x, Serialized<TInterface> y) => !(x == y);
-        public static bool operator ==(TInterface x, Serialized<TInterface> y) => y == x;
-        public static bool operator !=(Serialized<TInterface> x, TInterface y) => !(x == y);
-        public static bool operator ==(Serialized<TInterface> x, TInterface y)
+        public static bool operator !=(TInterface x, Serialized<TInterface, TSerialized> y) => !(x == y);
+        public static bool operator ==(TInterface x, Serialized<TInterface, TSerialized> y) => y == x;
+        public static bool operator !=(Serialized<TInterface, TSerialized> x, TInterface y) => !(x == y);
+        public static bool operator ==(Serialized<TInterface, TSerialized> x, TInterface y)
         {
             if (y is TSerialized obj)
             {
@@ -60,6 +60,7 @@ namespace Bipolar
                 return x.serializedObject == ySerialized.serializedObject;
             }
             return false;
+
         }
     }
 
