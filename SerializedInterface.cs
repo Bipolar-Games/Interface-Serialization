@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Bipolar
 {
@@ -7,6 +8,11 @@ namespace Bipolar
         where TInterface : class
     {
         public static explicit operator Serialized<TInterface>(TInterface iface) => new Serialized<TInterface>() { Value = iface };
+
+        public static bool operator ==(Serialized<TInterface> x, TInterface y) => x.Value == y;
+        public static bool operator ==(TInterface x, Serialized<TInterface> y) => x == y.Value;
+        public static bool operator !=(Serialized<TInterface> x, TInterface y) => x.Value != y;
+        public static bool operator !=(TInterface x, Serialized<TInterface> y) => x != y.Value;
     }
 
     [System.Serializable]
