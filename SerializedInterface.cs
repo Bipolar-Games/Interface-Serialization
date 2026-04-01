@@ -55,7 +55,7 @@ namespace Bipolar
             {
                 return x.serializedObject == y;
             }
-            else if (y is Serialized<TSerialized> ySerialized)
+            else if (y is Serialized<TInterface, TSerialized> ySerialized)
             {
                 return x.serializedObject == ySerialized.serializedObject;
             }
