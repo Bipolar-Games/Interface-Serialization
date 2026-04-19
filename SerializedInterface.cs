@@ -9,14 +9,19 @@ namespace Bipolar
         public static explicit operator Serialized<TInterface>(TInterface iface) => new Serialized<TInterface>() { Value = iface };
     }
 
+    internal interface ISerializedInterface
+    {
+        Object SerializedObject { get; }
+    }
+
     [System.Serializable]
-    public class Serialized<TInterface, TSerialized>
+    public class Serialized<TInterface, TSerialized> : ISerializedInterface
         where TInterface : class
         where TSerialized : Object
     {
         [SerializeField]
         private TSerialized serializedObject;
-
+            
         private TInterface _value;
         public virtual TInterface Value
         {
@@ -41,6 +46,8 @@ namespace Bipolar
 
         public System.Type Type => typeof(TInterface);
 
+        Object ISerializedInterface.SerializedObject => serializedObject;
+
         public static implicit operator TInterface(Serialized<TInterface, TSerialized> iface) => iface.Value;
         public static explicit operator Serialized<TInterface, TSerialized>(TInterface iface) => new Serialized<TInterface, TSerialized>() { Value = iface };
 
@@ -55,9 +62,9 @@ namespace Bipolar
             {
                 return x.serializedObject == y;
             }
-            else if (y is Serialized<TInterface, TSerialized> ySerialized)
+            else if (y is ISerializedInterface ySerialized)
             {
-                return x.serializedObject == ySerialized.serializedObject;
+                return x.serializedObject == ySerialized.SerializedObject;
             }
             return false;
 
