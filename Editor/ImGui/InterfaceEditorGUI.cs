@@ -233,9 +233,12 @@ namespace Bipolar.Editor
 
             void AssignValue(Object assignedObject)
             {
-                @object = assignedObject;
-                serializedObjectProperty.objectReferenceValue = assignedObject;
-                serializedObjectProperty.serializedObject.ApplyModifiedProperties();
+                @object = assignedObject; 
+                if (serializedObjectProperty != null)
+                {
+                    serializedObjectProperty.objectReferenceValue = assignedObject;
+                    serializedObjectProperty.serializedObject.ApplyModifiedProperties();
+                }
             }
         }
 
