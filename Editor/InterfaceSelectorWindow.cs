@@ -12,9 +12,9 @@ using UnityEditor.Experimental.SceneManagement;
 #if UNITY_2023_1_OR_NEWER
 using Hierarchy = UnityEditor.HierarchyIterator;
 #else
+using Hierarchy = UnityEditor.HierarchyProperty;
 #endif
 
-using Hierarchy = UnityEditor.HierarchyProperty;
 namespace Bipolar.Editor
 {
     public static class InterfaceTypesCache
