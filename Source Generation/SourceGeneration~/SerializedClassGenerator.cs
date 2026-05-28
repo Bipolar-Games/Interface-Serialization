@@ -11,6 +11,7 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
     public class SerializedClassGenerator : ISourceGenerator
     {
         private const string AttributeFullName = "Bipolar.InterfaceSerialization.GenerateSerializedClassAttribute";
+        private const string CustomClassNamePropertyName = "CustomClassName";
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -28,14 +29,18 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
                 if (model.GetDeclaredSymbol(interfaceSyntax) is not INamedTypeSymbol symbol)
                     continue;
 
-                bool hasAttribute = symbol.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == AttributeFullName);
-                if (hasAttribute == false)
+                var attribute = symbol.GetAttributes().FirstOrDefault(a => a.AttributeClass?.ToDisplayString() == AttributeFullName);
+                if (attribute == null)
                     continue;
-
+     
                 string interfaceName = symbol.Name;
+     
+                var customNameProperty = attribute.NamedArguments.FirstOrDefault(kvp => kvp.Key == CustomClassNamePropertyName).Value;
+                string className = customNameProperty.Value is string customName 
+                    ? customName 
+                    : GetClassName(interfaceName);
+ 
                 string? namespaceName = symbol.ContainingNamespace?.ToDisplayString();
-                string className = GetClassName(interfaceName);
-
                 var source = GenerateSource(namespaceName, className, interfaceName, symbol);
                 context.AddSource($"{className}.g.cs", source);
             }
