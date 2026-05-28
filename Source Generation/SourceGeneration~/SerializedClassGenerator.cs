@@ -81,6 +81,9 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
         {
             var members = symbol.GetMembers();
             bool isFirstIteration = true;
+
+            bool hasPropertyNamedValue = members.OfType<IPropertySymbol>().Any(p => p.Name == "Value");
+            string valueText = hasPropertyNamedValue ? "base.Value" : "Value";
             foreach (var member in members)
             {
                 if (member is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
@@ -118,7 +121,7 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
                 var arguments = string.Join(", ", method.Parameters
                     .Select(p => p.Name));
 
-                writer.WriteLine($"public {returnTypeName} {methodName}({parameters}) => Value.{methodName}({arguments});");
+                writer.WriteLine($"public {returnTypeName} {methodName}({parameters}) => {valueText}.{methodName}({arguments});");
             }
 
             void WriteProperty(IPropertySymbol property)
@@ -131,21 +134,24 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
 
                 if (hasGet && hasSet)
                 {
-                    writer.WriteLine($"public {returnTypeName} {propertyName}");
+                    writer.Write($"public ");
+                    if (propertyName == "Value")
+                        writer.Write($"new ");
+                    writer.WriteLine($"{returnTypeName} {propertyName}");
                     writer.WriteLine("{");
                     writer.Indent++;
-                    writer.WriteLine($"get => Value.{propertyName};");
-                    writer.WriteLine($"set => Value.{propertyName} = value;");
+                    writer.WriteLine($"get => {valueText}.{propertyName};");
+                    writer.WriteLine($"set => {valueText}.{propertyName} = value;");
                     writer.Indent--;
                     writer.WriteLine("}");
                 }
                 else if (hasGet)
                 {
-                    writer.WriteLine($"public {returnTypeName} {propertyName} => Value.{propertyName};");
+                    writer.WriteLine($"public {returnTypeName} {propertyName} => {valueText}.{propertyName};");
                 }
                 else if (hasSet)
                 {
-                    writer.WriteLine($"public {returnTypeName} {propertyName} {{ set => Value.{propertyName} = value; }}");
+                    writer.WriteLine($"public {returnTypeName} {propertyName} {{ set => {valueText}.{propertyName} = value; }}");
                 }
             }
 
@@ -157,8 +163,8 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
                 writer.WriteLine($"public event {eventTypeName} {eventName}");
                 writer.WriteLine("{");
                 writer.Indent++;
-                writer.WriteLine($"add => Value.{eventName} += value;");
-                writer.WriteLine($"remove => Value.{eventName} -= value;");
+                writer.WriteLine($"add => {valueText}.{eventName} += value;");
+                writer.WriteLine($"remove => {valueText}.{eventName} -= value;");
                 writer.Indent--;
                 writer.WriteLine("}");
             }
