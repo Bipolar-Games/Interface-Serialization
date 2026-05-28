@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -42,35 +44,41 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
 
         private static string GetClassName(string interfaceName)
         {
-            if (interfaceName.Length > 1
-                && interfaceName[0] == 'I'
-                && char.IsUpper(interfaceName[1]))
-            {
-                return interfaceName.Substring(1);
-            }
-
-            return "Serialized" + interfaceName;
+            return interfaceName.Length > 1 && interfaceName[0] == 'I' && char.IsUpper(interfaceName[1])
+                ? interfaceName.Substring(1)
+                : "Serialized" + interfaceName;
         }
 
         private static string GenerateSource(string? namespaceName, string className, string interfaceName)
         {
-            var builder = new StringBuilder();
+            var textWriter = new StringWriter();
+            var codeWriter = new IndentedTextWriter(textWriter);
             var hasNamespace = !string.IsNullOrWhiteSpace(namespaceName) && namespaceName != "<global namespace>";
-            if (hasNamespace)
-            {
-                builder.AppendLine($"namespace {namespaceName}");
-                builder.AppendLine("{");
-            }
-
-            builder.AppendLine("[System.Serializable]");
-            builder.AppendLine($"    public class {className} : Bipolar.Serialized<{interfaceName}>, {interfaceName} {{ }}");
 
             if (hasNamespace)
             {
-                builder.AppendLine("}");
+                codeWriter.WriteLine($"namespace {namespaceName}");
+                codeWriter.WriteLine("{");
+                codeWriter.Indent++;
             }
 
-            return builder.ToString();
+            codeWriter.WriteLine("[System.Serializable]");
+            codeWriter.WriteLine($"public class {className} : Bipolar.Serialized<{interfaceName}>, {interfaceName}");
+            codeWriter.WriteLine("{");
+            codeWriter.Indent++;
+
+            // TODO: members
+
+            codeWriter.Indent--;
+            codeWriter.WriteLine("}");
+
+            if (hasNamespace)
+            {
+                codeWriter.Indent--;
+                codeWriter.WriteLine("}");
+            }
+
+            return textWriter.ToString();
         }
     }
 
