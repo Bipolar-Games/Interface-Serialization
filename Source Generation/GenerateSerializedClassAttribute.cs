@@ -1,3 +1,4 @@
+#if UNITY_2022_1_OR_NEWER
 using System;
 
 namespace Bipolar.InterfaceSerialization
@@ -6,3 +7,4 @@ namespace Bipolar.InterfaceSerialization
     public class GenerateSerializedClassAttribute : Attribute
     { }
 }
+#endif
