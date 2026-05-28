@@ -4,7 +4,6 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Bipolar.InterfaceSerialization.SourceGeneration
 {
@@ -20,7 +19,7 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if ((context.SyntaxReceiver is InterfacesWithAttributesSyntaxReceiver receiver) == false)
+            if (context.SyntaxReceiver is not InterfacesWithAttributesSyntaxReceiver receiver)
                 return;
 
             foreach (var interfaceSyntax in receiver.CandidateInterfaces)
@@ -29,15 +28,15 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
                 if (model.GetDeclaredSymbol(interfaceSyntax) is not INamedTypeSymbol symbol)
                     continue;
 
-                var hasAttribute = symbol.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == AttributeFullName);
+                bool hasAttribute = symbol.GetAttributes().Any(a => a.AttributeClass?.ToDisplayString() == AttributeFullName);
                 if (hasAttribute == false)
                     continue;
 
-                var interfaceName = symbol.Name;
-                var namespaceName = symbol.ContainingNamespace?.ToDisplayString();
-                var className = GetClassName(interfaceName);
+                string interfaceName = symbol.Name;
+                string? namespaceName = symbol.ContainingNamespace?.ToDisplayString();
+                string className = GetClassName(interfaceName);
 
-                var source = GenerateSource(namespaceName, className, interfaceName);
+                var source = GenerateSource(namespaceName, className, interfaceName, symbol);
                 context.AddSource($"{className}.g.cs", source);
             }
         }
@@ -49,12 +48,11 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
                 : "Serialized" + interfaceName;
         }
 
-        private static string GenerateSource(string? namespaceName, string className, string interfaceName)
+        private static string GenerateSource(string? namespaceName, string className, string interfaceName, INamedTypeSymbol symbol)
         {
             var textWriter = new StringWriter();
             var codeWriter = new IndentedTextWriter(textWriter);
-            var hasNamespace = !string.IsNullOrWhiteSpace(namespaceName) && namespaceName != "<global namespace>";
-
+            bool hasNamespace = !string.IsNullOrWhiteSpace(namespaceName) && namespaceName != "<global namespace>";
             if (hasNamespace)
             {
                 codeWriter.WriteLine($"namespace {namespaceName}");
@@ -66,9 +64,7 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
             codeWriter.WriteLine($"public class {className} : Bipolar.Serialized<{interfaceName}>, {interfaceName}");
             codeWriter.WriteLine("{");
             codeWriter.Indent++;
-
-            // TODO: members
-
+            WriteMemebers(codeWriter, symbol);
             codeWriter.Indent--;
             codeWriter.WriteLine("}");
 
@@ -79,6 +75,93 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
             }
 
             return textWriter.ToString();
+        }
+
+        private static void WriteMemebers(IndentedTextWriter writer, INamedTypeSymbol symbol)
+        {
+            var members = symbol.GetMembers();
+            bool isFirstIteration = true;
+            foreach (var member in members)
+            {
+                if (member is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
+                {
+                    WriteOptionalEmptyLine();
+                    WriteMethod(method);
+                }
+                else if (member is IPropertySymbol property)
+                {
+                    WriteOptionalEmptyLine();
+                    WriteProperty(property);
+                }
+                else if (member is IEventSymbol @event)
+                {
+                    WriteOptionalEmptyLine();
+                    WriteEvent(@event);
+                }
+            }
+
+            void WriteOptionalEmptyLine()
+            {
+                if (isFirstIteration == false)
+                    writer.WriteLine();
+                isFirstIteration = false;
+            }
+
+            void WriteMethod(IMethodSymbol method)
+            {
+                string returnTypeName = method.ReturnType.ToDisplayString();
+                string methodName = method.Name;
+
+                var parameters = string.Join(", ", method.Parameters
+                    .Select(p => $"{p.Type.ToDisplayString()} {p.Name}"));
+
+                var arguments = string.Join(", ", method.Parameters
+                    .Select(p => p.Name));
+
+                writer.WriteLine($"public {returnTypeName} {methodName}({parameters}) => Value.{methodName}({arguments});");
+            }
+
+            void WriteProperty(IPropertySymbol property)
+            {
+                string returnTypeName = property.Type.ToDisplayString();
+                string propertyName = property.Name;
+
+                bool hasGet = property.GetMethod != null;
+                bool hasSet = property.SetMethod != null;
+
+                if (hasGet && hasSet)
+                {
+                    writer.WriteLine($"public {returnTypeName} {propertyName}");
+                    writer.WriteLine("{");
+                    writer.Indent++;
+                    writer.WriteLine($"get => Value.{propertyName};");
+                    writer.WriteLine($"set => Value.{propertyName} = value;");
+                    writer.Indent--;
+                    writer.WriteLine("}");
+                }
+                else if (hasGet)
+                {
+                    writer.WriteLine($"public {returnTypeName} {propertyName} => Value.{propertyName};");
+                }
+                else if (hasSet)
+                {
+                    writer.WriteLine($"public {returnTypeName} {propertyName} {{ set => Value.{propertyName} = value; }}");
+                }
+            }
+
+            void WriteEvent(IEventSymbol @event)
+            {
+                var eventTypeName = @event.Type.ToDisplayString();
+                var eventName = @event.Name;
+
+                writer.WriteLine($"public event {eventTypeName} {eventName}");
+                writer.WriteLine("{");
+                writer.Indent++;
+                writer.WriteLine($"add => Value.{eventName} += value;");
+                writer.WriteLine($"remove => Value.{eventName} -= value;");
+                writer.Indent--;
+                writer.WriteLine("}");
+            }
         }
     }
 
