@@ -77,9 +77,9 @@ public class MyBehaviour : MonoBehaviour
 ```
 
 #### 2) Inheriting `Serialized<>` class
-
 If you are going to reference your interface in many classes, you might find it more convenient to create your own serialized class of interface by inheriting `Serialized<>` class.
 
+##### 2.1) Manual inheritance
 ```cs
 using UnityEngine;
 using Bipolar;
@@ -90,8 +90,33 @@ public class MyInterface : Serialized<IMyInterface>, IMyInterface
     public void MyMethod() => Value.MyMethod();
 }
 ```
-
 It requires some preparations, but it makes creation and usage of serialized interfaces simpler and more natural.
+
+##### 2.2) Auto source generation (Unity 2022 or newer)
+If you find inheriting the `Serialized<>` class manually a tedious task and your project uses Unity version 2022 or newer then there is another approach possible. The package supports automatic generation of the serialized class using Roslyn source generator. To indicate for which interface should be the class generated use `GenerateSerializedClass` attribute on that interface.   
+
+```cs
+[GenerateSerializedClass]
+public interface IMyInterface
+{
+    void MyMethod();
+}
+```
+
+This will generate a class with all required members implementations. Class name will be the interface name, but with prefix `I` removed, or if the interface name doesn't start with `I` (not recommended) the class will be named: `Serialized` + interface name.
+
+The name of the generated class can be manually overwritten by specifying `CustomClassName` property of the `GenerateSerializedClass` attribute.
+
+```cs
+[GenerateSerializedClass(CustomClassName = "MyInterfaceSerialized")]
+public interface IMyInterface
+{
+    void MyMethod();
+}
+```
+
+##### 2.3) Usage
+Regardless of the class definition method, the usage is the same.  Inherited class can be used as if it was any serialized object, while also implementing the interface. 
 
 ```cs
 using UnityEngine;
