@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>Bipolar.InterfaceSerialization.SourceGeneration</RootNamespace>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+
+        <ILMerge>false</ILMerge>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference ExcludAssets="runtime" Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
+    </ItemGroup>
+
+    <Target Name="CopyToUnityProjectAfterBuild" AfterTargets="Build">
+        <ItemGroup>
+            <_FilesToCopy Include="$(OutputPath)**\$(AssemblyName).dll" />
+            <_FilesToCopy Include="$(OutputPath)**\$(AssemblyName).pdb" />
+        </ItemGroup>
+        <Copy SourceFiles="@(_FilesToCopy)" DestinationFolder="$(OutputPath)..\..\..\.." />
+    </Target>
+</Project>
