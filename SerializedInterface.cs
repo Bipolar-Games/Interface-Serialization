@@ -9,7 +9,6 @@ namespace Bipolar
     public class Serialized<TInterface> : Serialized<TInterface, Object>
         where TInterface : class
     {
-        public static explicit operator Serialized<TInterface>(TInterface iface) => new Serialized<TInterface>() { Value = iface };
     }
 
     internal interface ISerializedInterface
@@ -61,9 +60,6 @@ namespace Bipolar
         public Type InterfaceType => typeof(TInterface);
 
         Object ISerializedInterface.SerializedObject => serializedObject;
-
-        public static implicit operator TInterface(Serialized<TInterface, TSerialized> iface) => iface.Value;
-        public static explicit operator Serialized<TInterface, TSerialized>(TInterface iface) => new Serialized<TInterface, TSerialized>() { Value = iface };
 
         public override string ToString() => Value?.ToString() ?? "null";
 
