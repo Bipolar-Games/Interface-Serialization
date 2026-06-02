@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
@@ -6,10 +7,9 @@ using Object = UnityEngine.Object;
 namespace Bipolar
 {
     [Serializable]
-    public class Serialized<TInterface> : Serialized<TInterface, Object>
+    public abstract class SerializedInterface<TInterface> : SerializedInterface<TInterface, Object>
         where TInterface : class
-    {
-    }
+    { }
 
     internal interface ISerializedInterface
     {
@@ -17,7 +17,53 @@ namespace Bipolar
     }
 
     [Serializable]
-    public class Serialized<TInterface, TSerialized> : ISerializedInterface, ISerializationCallbackReceiver, IEquatable<TInterface>
+    public abstract class SerializedInterface<TInterface, TSerialized> : ISerializedInterface, ISerializationCallbackReceiver, IEquatable<TInterface>
+        where TInterface : class
+        where TSerialized : Object
+    {
+        [SerializeField]
+        protected Serialized<TInterface, TSerialized> serializedObject;
+
+        public Type InterfaceType => typeof(TInterface);
+
+        Object ISerializedInterface.SerializedObject => serializedObject;
+
+        public override string ToString() => Value?.ToString() ?? "null";
+
+        public static bool operator !=(TInterface x, SerializedInterface<TInterface, TSerialized> y) => !y.Equals(x);
+        public static bool operator ==(TInterface x, SerializedInterface<TInterface, TSerialized> y) => y.Equals(x);
+        public static bool operator !=(SerializedInterface<TInterface, TSerialized> x, TInterface y) => !x.Equals(y);
+        public static bool operator ==(SerializedInterface<TInterface, TSerialized> x, TInterface y) => x.Equals(y); 
+
+        public bool Equals(TInterface other)
+        {
+            if (other is TSerialized)
+                return serializedObject == other;
+
+            if (other is ISerializedInterface ySerialized)
+                return serializedObject == ySerialized.SerializedObject;
+
+            return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ISerializedInterface ifaceSerialized)
+                return serializedObject == ifaceSerialized.SerializedObject;
+
+            if (obj is TInterface iface)
+                return Equals(iface);
+            
+            return false;
+        }
+
+        public override int GetHashCode() => serializedObject?.GetHashCode() ?? 0;
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize() => _value = null;
+        void ISerializationCallbackReceiver.OnAfterDeserialize() => _value = null;
+    }
+
+    public struct Serialized<TInterface, TSerialized> : ISerializedInterface, ISerializationCallbackReceiver, IEquatable<TInterface>
         where TInterface : class
         where TSerialized : Object
     {
@@ -25,7 +71,7 @@ namespace Bipolar
         private TSerialized serializedObject;
 
         private TInterface _value;
-        public virtual TInterface Value
+        public TInterface Value
         {
             get
             {
@@ -66,7 +112,7 @@ namespace Bipolar
         public static bool operator !=(TInterface x, Serialized<TInterface, TSerialized> y) => !y.Equals(x);
         public static bool operator ==(TInterface x, Serialized<TInterface, TSerialized> y) => y.Equals(x);
         public static bool operator !=(Serialized<TInterface, TSerialized> x, TInterface y) => !x.Equals(y);
-        public static bool operator ==(Serialized<TInterface, TSerialized> x, TInterface y) => x.Equals(y); 
+        public static bool operator ==(Serialized<TInterface, TSerialized> x, TInterface y) => x.Equals(y);
 
         public bool Equals(TInterface other)
         {
@@ -86,7 +132,7 @@ namespace Bipolar
 
             if (obj is TInterface iface)
                 return Equals(iface);
-            
+
             return false;
         }
 
@@ -98,6 +144,6 @@ namespace Bipolar
 
     public static class InterfaceExtensions
     {
-        public static Serialized<T> AsSerialized<T>(this T interfaceObject) where T : class => new Serialized<T>() { Value = interfaceObject };
+        public static SerializedInterface<T> AsSerialized<T>(this T interfaceObject) where T : class => new SerializedInterface<T>() { Value = interfaceObject };
     }
 }
