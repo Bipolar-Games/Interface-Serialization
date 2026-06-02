@@ -8,10 +8,11 @@ using System.Linq;
 namespace Bipolar.InterfaceSerialization.SourceGeneration
 {
     [Generator]
-    public class SerializedClassGenerator : ISourceGenerator
+    public class SerializedInterfaceClassGenerator : ISourceGenerator
     {
         private const string AttributeFullName = "Bipolar.InterfaceSerialization.GenerateSerializedClassAttribute";
         private const string CustomClassNamePropertyName = "CustomClassName";
+        private const string SerializedInterfaceClassName = "Serialized";
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -66,7 +67,7 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
             }
 
             codeWriter.WriteLine("[System.Serializable]");
-            codeWriter.WriteLine($"public class {className} : Bipolar.Serialized<{interfaceName}>, {interfaceName}");
+            codeWriter.WriteLine($"public class {className} : Bipolar.{SerializedInterfaceClassName}<{interfaceName}>, {interfaceName}");
             codeWriter.WriteLine("{");
             codeWriter.Indent++;
             WriteMemebers(codeWriter, symbol);
@@ -123,11 +124,8 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
                 string returnTypeName = method.ReturnType.ToDisplayString();
                 string methodName = method.Name;
 
-                var parameters = string.Join(", ", method.Parameters
-                    .Select(p => $"{p.Type.ToDisplayString()} {p.Name}"));
-
-                var arguments = string.Join(", ", method.Parameters
-                    .Select(p => p.Name));
+                var parameters = string.Join(", ", method.Parameters.Select(p => $"{p.Type.ToDisplayString()} {p.Name}"));
+                var arguments = string.Join(", ", method.Parameters.Select(p => p.Name));
 
                 writer.Write($"public ");
                 if (methodName == "Value")
@@ -148,23 +146,34 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
                 if (propertyName == "Value")
                     writer.Write($"new ");
                 
+                writer.Write($"{returnTypeName} {propertyName}");
                 if (hasGet && hasSet)
                 {
-                    writer.WriteLine($"{returnTypeName} {propertyName}");
+                    writer.WriteLine();
                     writer.WriteLine("{");
                     writer.Indent++;
-                    writer.WriteLine($"get => {valueText}.{propertyName};");
-                    writer.WriteLine($"set => {valueText}.{propertyName} = value;");
+                    writer.WriteLine($"get => {GetGetterBody()}");
+                    writer.WriteLine(GetSetterImplementation());
                     writer.Indent--;
                     writer.WriteLine("}");
                 }
                 else if (hasGet)
                 {
-                    writer.WriteLine($"{returnTypeName} {propertyName} => {valueText}.{propertyName};");
+                    writer.WriteLine(GetGetterBody());
                 }
                 else if (hasSet)
                 {
-                    writer.WriteLine($"{returnTypeName} {propertyName} {{ set => {valueText}.{propertyName} = value; }}");
+                    writer.WriteLine($" {{ {GetSetterImplementation()} }}");
+                }
+
+                string GetSetterImplementation()
+                {
+                    return $"set => {valueText}.{propertyName} = value;";
+                }
+
+                string GetGetterBody()
+                {
+                    return $" => {valueText}.{propertyName};";
                 }
             }
 

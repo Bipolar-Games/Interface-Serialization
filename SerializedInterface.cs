@@ -8,8 +8,7 @@ namespace Bipolar
     [Serializable]
     public class Serialized<TInterface> : Serialized<TInterface, Object>
         where TInterface : class
-    {
-    }
+    { }
 
     internal interface ISerializedInterface
     {
