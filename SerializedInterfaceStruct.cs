@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Linq;
 using UnityEngine;
 
 using Object = UnityEngine.Object;
@@ -8,6 +9,37 @@ namespace Bipolar
     internal interface ISerializedInterface
     {
         Object SerializedObject { get; }
+    }
+
+    [Serializable]
+    public struct Serialized<TInterface> : IEquatable<TInterface>, ISerializedInterface
+        where TInterface : class
+    {
+        [SerializeField]
+        internal Serialized<TInterface, Object> serializedValue;
+        public TInterface Value
+        {
+            readonly get => serializedValue.Value;
+            set => serializedValue.Value = value;
+        }
+
+        public readonly Type InterfaceType => typeof(TInterface);
+
+        public static bool operator !=(TInterface x, Serialized<TInterface> y) => !y.Equals(x);
+        public static bool operator ==(TInterface x, Serialized<TInterface> y) => y.Equals(x);
+        public static bool operator !=(Serialized<TInterface> x, TInterface y) => !x.Equals(y);
+        public static bool operator ==(Serialized<TInterface> x, TInterface y) => x.Equals(y);
+
+        public static bool operator !=(object x, Serialized<TInterface> y) => !y.Equals(x);
+        public static bool operator ==(object x, Serialized<TInterface> y) => y.Equals(x);
+        public static bool operator !=(Serialized<TInterface> x, object y) => !x.Equals(y);
+        public static bool operator ==(Serialized<TInterface> x, object y) => x.Equals(y);
+
+        public readonly bool Equals(TInterface other) => serializedValue.Equals(other);
+        public override readonly bool Equals(object obj) => serializedValue.Equals(obj);
+        public override readonly int GetHashCode() => serializedValue.GetHashCode();
+
+        readonly Object ISerializedInterface.SerializedObject => serializedValue.serializedObject;
     }
 
     [Serializable]
@@ -53,8 +85,6 @@ namespace Bipolar
 
         public readonly Type InterfaceType => typeof(TInterface);
 
-        readonly Object ISerializedInterface.SerializedObject => serializedObject;
-
         public override string ToString() => Value?.ToString() ?? "null";
 
         public static bool operator !=(TInterface x, Serialized<TInterface, TSerialized> y) => !y.Equals(x);
@@ -88,5 +118,6 @@ namespace Bipolar
 
         void ISerializationCallbackReceiver.OnBeforeSerialize() => _value = null;
         void ISerializationCallbackReceiver.OnAfterDeserialize() => _value = null;
+        readonly Object ISerializedInterface.SerializedObject => serializedObject;
     }
 }

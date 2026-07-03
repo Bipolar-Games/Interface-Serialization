@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace Bipolar.Editor
 {
-    [CustomPropertyDrawer(typeof(Serialized<,>), true)]
+    [CustomPropertyDrawer(typeof(Serialized<,>))]
 	public class SerializedInterfaceStructDrawer : PropertyDrawer
 	{
 		private const string serializedObjectPropertyName = "serializedObject";
