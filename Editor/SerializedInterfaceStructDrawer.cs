@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 #if !BIPOLAR_DISABLE_UI_TOOLKIT
 using UnityEngine.UIElements;
@@ -6,22 +7,24 @@ using UnityEngine.UIElements;
 
 namespace Bipolar.Editor
 {
-	[CustomPropertyDrawer(typeof(SerializedInterface<>), true)]
-	[CustomPropertyDrawer(typeof(SerializedInterface<,>), true)]
-	public class SerializedInterfaceDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(Serialized<,>), true)]
+	public class SerializedInterfaceStructDrawer : PropertyDrawer
 	{
 		private const string serializedObjectPropertyName = "serializedObject";
 
 #if !BIPOLAR_DISABLE_UI_TOOLKIT
-		public override VisualElement CreatePropertyGUI(SerializedProperty property)
+		public override VisualElement CreatePropertyGUI(SerializedProperty property) => CreatePropertyGUI(property, fieldInfo, property.displayName);
+
+		public static VisualElement CreatePropertyGUI(SerializedProperty property, FieldInfo fieldInfo, string displayName)
 		{
+            displayName ??= property.displayName;
 			var container = new VisualElement();
 
 			var serializedObjectProperty = property.FindPropertyRelative(serializedObjectPropertyName);
 			var requiredType = InterfaceEditorUtility.GetRequiredType(fieldInfo);
 			var buttons = InterfaceEditorUtility.GetButtons(fieldInfo);
 
-			InterfaceEditorUIToolkitHelper.DrawProperty(serializedObjectProperty, container, requiredType, property.displayName, buttons);
+			InterfaceEditorUIToolkitHelper.DrawProperty(serializedObjectProperty, container, requiredType, displayName, buttons);
 
 			return container;
 		}
