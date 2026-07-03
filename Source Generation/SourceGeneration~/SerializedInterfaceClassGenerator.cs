@@ -69,7 +69,7 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
             }
 
             codeWriter.WriteLine("[System.Serializable]");
-            codeWriter.WriteLine($"public class {className} : Bipolar.{SerializedInterfaceClassName}<{interfaceName}>, {interfaceName}");
+            codeWriter.WriteLine($"public sealed class {className} : Bipolar.{SerializedInterfaceClassName}<{interfaceName}>, {interfaceName}");
             codeWriter.WriteLine("{");
             codeWriter.Indent++;
             WriteMemebers(codeWriter, symbol);
