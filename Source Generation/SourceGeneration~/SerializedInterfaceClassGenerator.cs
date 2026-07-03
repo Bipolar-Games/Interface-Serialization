@@ -12,7 +12,7 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
     {
         private const string AttributeFullName = "Bipolar.InterfaceSerialization.GenerateSerializedClassAttribute";
         private const string CustomClassNamePropertyName = "CustomClassName";
-        private const string SerializedInterfaceClassName = "Serialized";
+        private const string SerializedInterfaceClassName = "SerializedInterface";
 
         public void Initialize(GeneratorInitializationContext context)
         {
