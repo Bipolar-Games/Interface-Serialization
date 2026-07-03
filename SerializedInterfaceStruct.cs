@@ -11,7 +11,7 @@ namespace Bipolar
     }
 
     [Serializable]
-    public struct Serialized<TInterface, TSerialized> : ISerializationCallbackReceiver, IEquatable<TInterface>, ISerializedInterface
+    public struct Serialized<TInterface, TSerialized> : IEquatable<TInterface>, ISerializationCallbackReceiver, ISerializedInterface
         where TInterface : class
         where TSerialized : Object
     {
