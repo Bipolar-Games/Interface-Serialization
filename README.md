@@ -58,7 +58,7 @@ There are a few different ways to create field for the interface.
 
 #### 1) Using `Serialized<>` type
 
-You can enclose your interface type with `Serialized<>` generic type to create a serialized version of your interface.
+You can enclose your interface type with `Serialized<>` generic type to create a serialized version of your interface. In order to access your interface value use property `Value`.
 
 ```cs
 using UnityEngine;
@@ -76,8 +76,8 @@ public class MyBehaviour : MonoBehaviour
 }
 ```
 
-#### 2) Inheriting `Serialized<>` class
-If you are going to reference your interface in many classes, you might find it more convenient to create your own serialized class of interface by inheriting `Serialized<>` class.
+#### 2) Inheriting `SerializedInterface<>` class
+If you are going to reference your interface in many classes, you might find it more convenient to create your own serialized class of interface by inheriting `SerializedInterface<>` class.
 
 ##### 2.1) Manual inheritance
 ```cs
@@ -85,7 +85,7 @@ using UnityEngine;
 using Bipolar;
 
 [System.Serializable]
-public class MyInterface : Serialized<IMyInterface>, IMyInterface
+public class MyInterface : SerializedInterface<IMyInterface>, IMyInterface
 {
     public void MyMethod() => Value.MyMethod();
 }
@@ -93,7 +93,7 @@ public class MyInterface : Serialized<IMyInterface>, IMyInterface
 It requires some preparations, but it makes creation and usage of serialized interfaces simpler and more natural.
 
 ##### 2.2) Auto source generation (Unity 2022 or newer)
-If you find inheriting the `Serialized<>` class manually a tedious task and your project uses Unity version 2022 or newer then there is another approach possible. The package supports automatic generation of the serialized class using Roslyn source generator. To indicate for which interface should be the class generated use `GenerateSerializedClass` attribute on that interface.   
+If you find inheriting the `SerializedInterface<>` class manually a tedious task and your project uses Unity version 2022 or newer then there is another approach possible. The package supports automatic generation of the serialized class using Roslyn source generator. To indicate for which interface should be the class generated use `GenerateSerializedClass` attribute on that interface.   
 
 ```cs
 [GenerateSerializedClass]
@@ -116,7 +116,7 @@ public interface IMyInterface
 ```
 
 ##### 2.3) Usage
-Regardless of the class definition method, the usage is the same.  Inherited class can be used as if it was any serialized object, while also implementing the interface. 
+Regardless of the class definition method, the usage is the same. Inherited class can be used as if it was any serialized object, while also implementing the interface. 
 
 ```cs
 using UnityEngine;
@@ -135,7 +135,7 @@ public class MyBehaviour : MonoBehaviour
 
 #### 3) Using `RequireInterface` attribute
 
-If you prefer using an attribute instead of `Serialized<>` class you can add the `RequireInterface` attribute to your `UnityEngine.Object` field. However this method requires casting your object every time you want to use a function of the interface.
+If you prefer using an attribute instead of custom serialized interface types you can add the `RequireInterface` attribute to your `UnityEngine.Object` field. However this method requires casting your object every time you want to use a function of the interface.
 
 ```cs
 using UnityEngine;
@@ -178,10 +178,10 @@ You can also find the available objects in custom Object Selector window, which 
 
 
 ### Side Buttons
-To make creation of new objects implementing the interface more streamlined side interface buttons were introduced. They allow to quickly create new objects without having to search through "Assets/Create" and "Add Component" menus, and automatically connect object reference to the field.
+To make creation of new objects implementing the interface more streamlined, side interface buttons were introduced. They allow to quickly create new objects without having to search through "Assets/Create" and "Component/Add..." menus, and automatically connect object reference to the field.
 
 #### New Object Button Attribute
-To show side buttons with the interface field you need to apply `NewObjectButton` attribute to the field. The field must either inherit from `Serialized<,>` or have `RequireInterface` attribute applied. The `NewObjectButton` attribute constructor requires specifying which buttons should be shown with `ObjectCreationTypes` enumeration. Any combination of following types can be chosen:
+To show side buttons with the interface field you need to apply `NewObjectButton` attribute to the field. The field must either inherit from `SerializedInterface<,>` or be a `Serialized<>` type or have `RequireInterface` attribute applied. The `NewObjectButton` attribute constructor requires specifying which buttons should be shown with `ObjectCreationTypes` enumeration. Any combination of following types can be chosen:
 - `AddComponent` - shows a button which allows adding a Component implementing the interface to the GameObject and assigns it to the interface field
 - `CreateAsset` - shows a button that allows creating a new instance of ScriptableObject implementing the interface and assigns it to the interface field
 
