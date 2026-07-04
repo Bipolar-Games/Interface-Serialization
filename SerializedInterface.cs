@@ -37,6 +37,12 @@ namespace Bipolar
         public override bool Equals(object obj) => serializedValue.Equals(obj);
         public override int GetHashCode() => serializedValue.GetHashCode();
 
+        public static T MakeSerialized<T>(TInterface interfaceObject)
+            where T : ISerializedInterface<TInterface>, TInterface, new()
+        {
+            return new T() { Value = interfaceObject };
+        }
+
         Object IObjectContainter.SerializedObject => serializedValue.serializedObject;
     }
 
