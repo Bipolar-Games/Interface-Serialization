@@ -5,14 +5,24 @@ using Object = UnityEngine.Object;
 
 namespace Bipolar
 {
+    public interface ISerializedInterface<TInterface>
+        where TInterface : class
+    {
+        TInterface Value { get; set; }
+    }
+
     [Serializable]
-    public abstract class SerializedInterface<TInterface, TSerialized> : IEquatable<TInterface>, ISerializedInterface
+    public abstract class SerializedInterface<TInterface, TSerialized> : IEquatable<TInterface>, IObjectContainter, ISerializedInterface<TInterface>
         where TInterface : class
         where TSerialized : Object
     {
         [SerializeField]
         protected Serialized<TInterface, TSerialized> serializedValue;
-        public TInterface Value => serializedValue.Value;
+        public TInterface Value
+        {
+            get => serializedValue.Value; 
+            set => serializedValue.Value = value;
+        }
 
         public Type InterfaceType => typeof(TInterface);
 
@@ -27,7 +37,7 @@ namespace Bipolar
         public override bool Equals(object obj) => serializedValue.Equals(obj);
         public override int GetHashCode() => serializedValue.GetHashCode();
 
-        Object ISerializedInterface.SerializedObject => serializedValue.serializedObject;
+        Object IObjectContainter.SerializedObject => serializedValue.serializedObject;
     }
 
     [Serializable]

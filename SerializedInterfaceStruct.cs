@@ -5,13 +5,13 @@ using Object = UnityEngine.Object;
 
 namespace Bipolar
 {
-    internal interface ISerializedInterface
+    internal interface IObjectContainter
     {
         Object SerializedObject { get; }
     }
 
     [Serializable]
-    public struct Serialized<TInterface> : IEquatable<TInterface>, ISerializedInterface
+    public struct Serialized<TInterface> : ISerializedInterface<TInterface>, IEquatable<TInterface>, IObjectContainter
         where TInterface : class
     {
         [SerializeField]
@@ -38,11 +38,11 @@ namespace Bipolar
         public override readonly bool Equals(object obj) => serializedValue.Equals(obj);
         public override readonly int GetHashCode() => serializedValue.GetHashCode();
 
-        readonly Object ISerializedInterface.SerializedObject => serializedValue.serializedObject;
+        readonly Object IObjectContainter.SerializedObject => serializedValue.serializedObject;
     }
 
     [Serializable]
-    public struct Serialized<TInterface, TSerialized> : IEquatable<TInterface>, ISerializationCallbackReceiver, ISerializedInterface
+    public struct Serialized<TInterface, TSerialized> : ISerializedInterface<TInterface>, IEquatable<TInterface>, ISerializationCallbackReceiver, IObjectContainter
         where TInterface : class
         where TSerialized : Object
     {
@@ -96,7 +96,7 @@ namespace Bipolar
             if (other is TSerialized)
                 return serializedObject == other;
 
-            if (other is ISerializedInterface ySerialized)
+            if (other is IObjectContainter ySerialized)
                 return serializedObject == ySerialized.SerializedObject;
 
             return false;
@@ -104,7 +104,7 @@ namespace Bipolar
 
         public readonly override bool Equals(object obj)
         {
-            if (obj is ISerializedInterface ifaceSerialized)
+            if (obj is IObjectContainter ifaceSerialized)
                 return serializedObject == ifaceSerialized.SerializedObject;
 
             if (obj is TInterface iface)
@@ -117,6 +117,6 @@ namespace Bipolar
 
         void ISerializationCallbackReceiver.OnBeforeSerialize() => _value = null;
         void ISerializationCallbackReceiver.OnAfterDeserialize() => _value = null;
-        readonly Object ISerializedInterface.SerializedObject => serializedObject;
+        readonly Object IObjectContainter.SerializedObject => serializedObject;
     }
 }
