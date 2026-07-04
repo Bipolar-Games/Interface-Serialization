@@ -2,7 +2,7 @@
 
 namespace Bipolar
 {
-    public class RequireInterfaceAttribute : PropertyAttribute
+    public sealed class RequireInterfaceAttribute : PropertyAttribute
     {
         public System.Type RequiredType { get; private set; }
 

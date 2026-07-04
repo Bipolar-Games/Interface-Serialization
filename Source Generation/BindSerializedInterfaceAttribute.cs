@@ -4,7 +4,7 @@ using System;
 namespace Bipolar.InterfaceSerialization
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class BindSerializedInterfaceAttribute : Attribute
+    public sealed class BindSerializedInterfaceAttribute : Attribute
     {
         public Type InterfaceType { get; }
 

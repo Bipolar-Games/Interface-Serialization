@@ -2,7 +2,7 @@
 
 namespace Bipolar
 {
-    public class NewObjectButtonAttribute : PropertyAttribute
+    public sealed class NewObjectButtonAttribute : PropertyAttribute
     {
         public ObjectCreationTypes ButtonType { get; private set; }
 
