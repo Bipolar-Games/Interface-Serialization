@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -8,8 +9,9 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
     public static class SerializedInterfaceClassSourceGenerator
     {
         public const string SerializedInterfaceClassName = "SerializedInterface";
-    
-        public static string GenerateSource(string? namespaceName, string className, string interfaceName, INamedTypeSymbol interfaceSymbol, bool isPartial = false)
+
+        public static string GenerateSource(string? namespaceName, string className, string interfaceName,
+            INamedTypeSymbol interfaceSymbol, List<INamedTypeSymbol>? containingTypes = null, bool isPartial = false)
         {
             var textWriter = new StringWriter();
             var codeWriter = new IndentedTextWriter(textWriter);
@@ -20,8 +22,22 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
             if (hasNamespace)
             {
                 codeWriter.WriteLine($"namespace {namespaceName}");
-                codeWriter.WriteLine("{");
-                codeWriter.Indent++;
+                OpenContext(codeWriter);
+            }
+
+            if (containingTypes != null)
+            {
+                foreach (var containingType in containingTypes)
+                {
+                    var typeKind = containingType.TypeKind switch
+                    {
+                        TypeKind.Interface => "interface",
+                        TypeKind.Struct => "struct",
+                        _ => "class"
+                    };
+                    codeWriter.WriteLine($"public partial {typeKind} {containingType.Name}");
+                    OpenContext(codeWriter);
+                }
             }
 
             codeWriter.WriteLine("[System.Serializable]");
@@ -29,19 +45,36 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
             if (isPartial)
                 codeWriter.Write($"partial ");
             codeWriter.WriteLine($"class {className} : Bipolar.{SerializedInterfaceClassName}<{interfaceName}>, {interfaceName}");
-            codeWriter.WriteLine("{");
-            codeWriter.Indent++;
-            WriteMemebers(codeWriter, interfaceSymbol);
-            codeWriter.Indent--;
-            codeWriter.WriteLine("}");
 
-            if (hasNamespace)
+            OpenContext(codeWriter);
+            WriteMemebers(codeWriter, interfaceSymbol);
+            CloseContext(codeWriter);
+
+            if (containingTypes != null)
             {
-                codeWriter.Indent--;
-                codeWriter.WriteLine("}");
+                foreach (var containingType in containingTypes)
+                {
+                    CloseContext(codeWriter);
+                }
             }
 
+
+            if (hasNamespace)
+                CloseContext(codeWriter);
+
             return textWriter.ToString();
+        }
+
+        private static void OpenContext(IndentedTextWriter writer)
+        {
+            writer.WriteLine("{");
+            writer.Indent++;
+        }
+
+        private static void CloseContext(IndentedTextWriter writer)
+        {
+            writer.Indent--;
+            writer.WriteLine("}");
         }
 
         private static void WriteMemebers(IndentedTextWriter writer, INamedTypeSymbol symbol)

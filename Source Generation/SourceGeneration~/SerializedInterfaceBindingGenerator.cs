@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
 
 namespace Bipolar.InterfaceSerialization.SourceGeneration
 {
@@ -35,8 +36,9 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
                 var className = classSymbol.Name;
                 var interfaceName = interfaceSymbol.Name;
                 var namespaceName = classSymbol.ContainingNamespace?.ToDisplayString();
+                var containingTypes = GetContainingTypes(classSymbol);
 
-                var source = SerializedInterfaceClassSourceGenerator.GenerateSource(namespaceName, className, interfaceName, interfaceSymbol, isPartial: true);
+                var source = SerializedInterfaceClassSourceGenerator.GenerateSource(namespaceName, className, interfaceName, interfaceSymbol, containingTypes, isPartial: true);
                 context.AddSource($"{className}.SerializedInterfaceBinding.g.cs", source);
             }
         }
@@ -55,6 +57,21 @@ namespace Bipolar.InterfaceSerialization.SourceGeneration
 
             attribute = null!;
             return false;
+        }
+
+        private static List<INamedTypeSymbol> GetContainingTypes(INamedTypeSymbol symbol)
+        {
+            var chain = new List<INamedTypeSymbol>();
+            var current = symbol.ContainingType;
+
+            while (current != null)
+            {
+                chain.Add(current);
+                current = current.ContainingType;
+            }
+
+            chain.Reverse();
+            return chain;
         }
     }
 }
