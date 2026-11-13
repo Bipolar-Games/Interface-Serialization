@@ -22,10 +22,20 @@ namespace Bipolar
 
         public override string ToString() => serializedValue.ToString();
 
-        public static bool operator !=(TInterface x, SerializedInterface<TInterface, TSerialized> y) => !y.Equals(x);
-        public static bool operator ==(TInterface x, SerializedInterface<TInterface, TSerialized> y) => y.Equals(x);
-        public static bool operator !=(SerializedInterface<TInterface, TSerialized> x, TInterface y) => !x.Equals(y);
-        public static bool operator ==(SerializedInterface<TInterface, TSerialized> x, TInterface y) => x.Equals(y);
+        // Only one operand order is defined on purpose. Defining both (TInterface, SerializedInterface)
+        // and (SerializedInterface, TInterface) makes `x == null` ambiguous for classes that derive
+        // from SerializedInterface and implement TInterface at the same time.
+        public static bool operator !=(SerializedInterface<TInterface, TSerialized> x, TInterface y) => !(x == y);
+        public static bool operator ==(SerializedInterface<TInterface, TSerialized> x, TInterface y)
+        {
+            if (x is null)
+                return y is null;
+
+            if (y is null)
+                return x.serializedValue.serializedObject == null;
+
+            return x.Equals(y);
+        }
 
         public bool Equals(TInterface other) => serializedValue.Equals(other);
         public override bool Equals(object obj) => serializedValue.Equals(obj);
