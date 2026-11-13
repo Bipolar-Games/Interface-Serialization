@@ -12,7 +12,11 @@ namespace Bipolar
     {
         [SerializeField]
         protected Serialized<TInterface, TSerialized> serializedValue;
-        public TInterface Value => serializedValue.Value;
+        public TInterface Value
+        {
+            get => serializedValue.Value;
+            set => serializedValue.Value = value;
+        }
 
         public Type InterfaceType => typeof(TInterface);
 
