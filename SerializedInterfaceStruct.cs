@@ -57,7 +57,6 @@ namespace Bipolar
                 _value ??= serializedObject as TInterface;
                 return _value;
             }
-
             set
             {
                 SetValue(value);
