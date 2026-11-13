@@ -1,6 +1,6 @@
 {
     "name": "com.bipolar.interfaces",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "displayName": "Bipolar Interface Serialization",
     "description": "Consistent system which enables referencing and serializing UnityEngine.Objects by interface",
     "unity": "2020.3",
